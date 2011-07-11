@@ -493,12 +493,12 @@ s,@INSTALL_DATA@,${INSTALL} -m 644,;t t
 s,@CYGPATH_W@,echo,;t t
 s,@PACKAGE@,cnver,;t t
 s,@VERSION@,0.8.1,;t t
-s,@ACLOCAL@,${SHELL} /home/pashadag/cnver_source/missing --run aclocal-1.9,;t t
-s,@AUTOCONF@,${SHELL} /home/pashadag/cnver_source/missing --run autoconf,;t t
-s,@AUTOMAKE@,${SHELL} /home/pashadag/cnver_source/missing --run automake-1.9,;t t
-s,@AUTOHEADER@,${SHELL} /home/pashadag/cnver_source/missing --run autoheader,;t t
-s,@MAKEINFO@,${SHELL} /home/pashadag/cnver_source/missing --run makeinfo,;t t
-s,@install_sh@,/home/pashadag/cnver_source/install-sh,;t t
+s,@ACLOCAL@,${SHELL} /home/pmedvedev/Cnver/missing --run aclocal-1.9,;t t
+s,@AUTOCONF@,${SHELL} /home/pmedvedev/Cnver/missing --run autoconf,;t t
+s,@AUTOMAKE@,${SHELL} /home/pmedvedev/Cnver/missing --run automake-1.9,;t t
+s,@AUTOHEADER@,${SHELL} /home/pmedvedev/Cnver/missing --run autoheader,;t t
+s,@MAKEINFO@,${SHELL} /home/pmedvedev/Cnver/missing --run makeinfo,;t t
+s,@install_sh@,/home/pmedvedev/Cnver/install-sh,;t t
 s,@STRIP@,,;t t
 s,@ac_ct_STRIP@,,;t t
 s,@INSTALL_STRIP_PROGRAM@,${SHELL} $(install_sh) -c -s,;t t
@@ -506,7 +506,7 @@ s,@mkdir_p@,mkdir -p --,;t t
 s,@AWK@,gawk,;t t
 s,@SET_MAKE@,,;t t
 s,@am__leading_dot@,.,;t t
-s,@AMTAR@,${SHELL} /home/pashadag/cnver_source/missing --run tar,;t t
+s,@AMTAR@,${SHELL} /home/pmedvedev/Cnver/missing --run tar,;t t
 s,@am__tar@,${AMTAR} chof - "$$tardir",;t t
 s,@am__untar@,${AMTAR} xf -,;t t
 s,@CC@,gcc,;t t
