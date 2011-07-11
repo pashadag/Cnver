@@ -1,0 +1,7 @@
+To install, 
+1. ./configure
+2. make
+3. Set CNVER_FOLDER variable to the cnver directory (e.g. ~/cnver-0.8.3/)
+
+Please see online for the usage instructions, http://compbio.cs.toronto.edu/CNVer
+

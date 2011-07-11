@@ -1,0 +1,4 @@
+bin_PROGRAMS=sequence findRepeats
+sequence_SOURCES=sequence.cpp
+findRepeats_SOURCES=findRepeats.cpp
+EXTRA_DIST=sim_repeats.sh
