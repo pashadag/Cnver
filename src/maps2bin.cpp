@@ -17,7 +17,7 @@ typedef pair<string,int> ref_pair;
 typedef map<string,int> ref_map_t;
 ref_map_t ref_names_map;
 vector<ofstream *> outf;
-
+ofstream readNamesIdx;
 
 // append every mapping with the norm odds, modified chromosome name, and dump it
 void process_block(deque<Map_t> & block) {
@@ -61,6 +61,8 @@ int main ( int argc, char ** argv) {
 		open_file_binary(*outf[i], ref_names[i]  + ".rmap");
 	}
 
+	open_file_binary(readNamesIdx, "readNames.idx");
+
 	//read in the read mappings, grouping them into blocks with the same read_id.  
 	//Each block is then handled in process_block
 	uint64_t lastReadId = -1;
@@ -68,9 +70,13 @@ int main ( int argc, char ** argv) {
 		InputReader reader(input_format, map_list[map_file_index], lastReadId + 1);
 		Map_t mapt;
 		deque<Map_t> block;
-		string lastReadName = "2paclives";
 		while (reader.getNext(mapt)) {
 			if (lastReadId != mapt.read_id) {
+				string bam_readname = reader.getLastReadName();
+				assert(bam_readname.size() < MAX_BAM_READNAME);
+				char name[MAX_BAM_READNAME];
+				strcpy(name, bam_readname.c_str());
+				readNamesIdx.write(bam_readname.c_str(), MAX_BAM_READNAME);
 				process_block(block);  
 				block.clear();
 			} 
@@ -86,5 +92,8 @@ int main ( int argc, char ** argv) {
 		outf[i]->close();
 		delete outf[i];
 	}
+
+	readNamesIdx.close();
+
 	return 0;	
 }

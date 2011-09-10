@@ -23,7 +23,7 @@ long offset = 0;
 string in_filename;
 
 void usage(int argc, char * argv[]) {
-	cerr << "Usage: " << argv[0] << " binfile type(rmap/int/double) offset (default is 0, can be negative)\n";
+	cerr << "Usage: " << argv[0] << " binfile type(rmap/int/double/bamnames/char) offset (default is 0, can be negative)\n";
 	exit(1);
 }
 
@@ -44,6 +44,15 @@ void process_file(T data) {
 	}
 }
 
+struct BamReadName {
+	char name[MAX_BAM_READNAME];
+};
+
+ostream & operator<< (ostream & out, const BamReadName & bamreadname) {
+    out << bamreadname.name;
+    return out;
+}
+
 
 int main(int argc, char * argv[]) {
 
@@ -61,6 +70,12 @@ int main(int argc, char * argv[]) {
 		process_file(data);
 	} else if (datatype == "double") {
 		double data;
+		process_file(data);
+	} else if (datatype == "bamnames") {
+		BamReadName data;
+		process_file(data);
+	} else if (datatype == "char") {
+		char data;
 		process_file(data);
 	}
 	return 0 ;

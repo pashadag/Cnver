@@ -64,8 +64,8 @@ my $retval;
 #print "DOC_Analysis\n";
 @$retval = `$CNVER_FOLDER/src/post_analysis/doc_walker $scov_file $gc_file $from $to`;
 #print $retval . "\n";
-print "Don\tRef\tTotLen\tUnmaskedLen\tDOC_Ratio\tEndOffset\n";
-execCommand("$CNVER_FOLDER/src/post_analysis/edge_walker $graphinfo_file $problemout_file $from $to | grep E: | tr ':' ' ' | tr ',' ' ' | awk -v OFS=\"\\t\" '{ if (\$21 > 0) rat=int(100*\$15/\$21)/100; else rat = 0; print \$9, \$13, \$17, \$19,  rat, \$6  }'");
+print "Don\tRef\tTotLen\tUnmaskedLen\tDOC_Ratio\tEndOffset\tEdge#\n";
+execCommand("$CNVER_FOLDER/src/post_analysis/edge_walker $graphinfo_file $problemout_file $from $to | grep E: | tr ':' ' ' | tr ',' ' ' | awk -v OFS=\"\\t\" '{ if (\$21 > 0) rat=int(100*\$15/\$21)/100; else rat = 0; print \$9, \$13, \$17, \$19,  rat, \$6, \$2  }'");
 
 $retval = `$CNVER_FOLDER/src/post_analysis/edge_walker $graphinfo_file $problemout_file $from $to Y | grep -v BUCKET | grep -v START | awk '{ print \$8 }'`;
 

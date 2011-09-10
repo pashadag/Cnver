@@ -19,6 +19,44 @@
 using namespace std;
 
 
+class Link {
+public:
+	string chr;
+	int from;
+	int to;
+	int type;
+	string label;
+
+	Link() {}
+	Link(string _chr, int _from, int _to, int _type, string _label = "") : chr(_chr), from(_from), to(_to), type(_type), label(_label)  {}
+};
+
+ostream & operator << (ostream & out, const Link & i) {
+	out << i.chr << "\t" << i.from << "\t" << i.to;
+	if (i.label != "") out << "\t" << i.label;
+	return out;
+}
+
+Link read_link(string sbuf) {
+	istringstream line(sbuf);
+	Link i;
+	line >> i.chr >> i.from >> i.to >> i.type;
+	getline(line, i.label); //the rest of the line is a label
+	return i;
+}
+
+
+template<class T>
+int read_links(istream & in, T & links) {
+	string sbuf;
+	int num_read = 0;
+	while (getline(in, sbuf)) {
+		links.push_back(read_link(sbuf));
+		num_read++;
+	}
+	return num_read;
+}
+
 class Interval {  //the intervals are assumed to contain the endpoints.
 	public:
 		string chr;
@@ -96,7 +134,7 @@ ostream & operator << (ostream & out, const Interval & i) {
 	//out << i.chr << " " << i.start << " " << i.end;
 	//if (i.label != "") out << " " << i.label;
 	out << i.chr << "\t" << i.start << "\t" << i.end;
-	if (i.label != "") out << "\t" << i.label;
+	if (i.label != "") out <<  i.label;
 	return out;
 }
 
@@ -110,11 +148,14 @@ Interval read_interval(string sbuf) {
 
 
 template<class T>
-void read_intervals(istream & in, T & intervals) {
+int read_intervals(istream & in, T & intervals) {
 	string sbuf;
+	int num_read = 0;
 	while (getline(in, sbuf)) {
 		intervals.push_back(read_interval(sbuf));
+		num_read++;
 	}
+	return num_read;
 }
 
 #endif

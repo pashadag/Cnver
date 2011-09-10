@@ -288,7 +288,7 @@ double get_scov_arrivals(double * scov, uint64_t contig_length, uint64_t start, 
 			} else {
 				printf("%f %u\n",lambdas[j-1],j-1);
 			}
-			assert(lambdas[j-1]>0.0);
+			//assert(lambdas[j-1]>0.0);
 			//only count non-repeat regions
 			sum += scov[j-1];
 		}      
@@ -332,163 +332,163 @@ void write_out(map < uint64_t, edge > &edges, map < uint64_t,
     strcpy(sif_filename, edge_filename);
     strcat(sif_filename, ".sif");
     FILE *f_sif = fopen(sif_filename, "w");
-    if (f_edges == NULL) {
-	printf("Opening of file, %s, failed.\n", sif_filename);
-	exit(1);
-    }
-    //PRINT IN GML FORMAT
-    /*fprintf(f_edges,"graph [\n");
+	if (f_edges == NULL) {
+		printf("Opening of file, %s, failed.\n", sif_filename);
+		exit(1);
+	}
+	//PRINT IN GML FORMAT
+	/*fprintf(f_edges,"graph [\n");
 
-       //map<uint64_t, node>::iterator nit = nodes.begin();
-       for (int i=0; i<nodes.size(); i++) {
-       fprintf(f_edges,"\tnode [\n");
-       fprintf(f_edges,"\t\tid %d\n",i);
-       fprintf(f_edges,"\t\tlabel \"");
-       set<pos>::iterator sit = nodes[i].positions.begin();
-       if (sit!=nodes[i].positions.end()) {
-       fprintf(f_edges,"%llu%c",sit->contigpos,sit->strand);
-       }
-       sit++;
-       for ( ; sit!=nodes[i].positions.end(); sit++) {
-       fprintf(f_edges,",%llu%c",sit->contigpos,sit->strand);
-       }
-       fprintf(f_edges,"\"\n");
-       fprintf(f_edges,"\t]\n");
-       }
-
-
-       for (int i=0; i<edges.size(); i++) {
-       char oreintation[3]="oo";
-       if (edges[i].from_bit) {
-       oreintation[0]='i';
-       }
-       if (edges[i].to_bit) {
-       oreintation[1]='i';
-       }
-       oreintation[2]='\0';
-       fprintf(f_edges,"\tedge [\n");
-       fprintf(f_edges,"\t\tsource %llu\n",edges[i].start);
-       fprintf(f_edges,"\t\ttarget %llu\n",edges[i].end);
-       fprintf(f_edges,"\t\tTYPE %s\n",oreintation);
-       //fprintf(f_edges,"%llu %s %llu\n",edges[i].start,orientation,edges[i].end);
-       fprintf(f_edges,"\t]\n");
-       }
-
-       fprintf(f_edges,"]\n"); */
-
-
-    //PRINT IN TABLE FORMAT
-    fprintf(f_edges, "SOURCE\tinteraction\tDESTINATION\tTYPE\n");
-    map < uint64_t, edge >::iterator it = edges.begin();
-    for (; it != edges.end(); it++) {
-	edge e = it->second;
-	//Print first node
-	fprintf(f_edges, "%d[", e.start);
-	set < pos >::iterator sit = nodes[e.start].positions.begin();
-	if (sit != nodes[e.start].positions.end()) {
-	    fprintf(f_edges, "%llu%c", sit->contigpos, sit->strand);
+	//map<uint64_t, node>::iterator nit = nodes.begin();
+	for (int i=0; i<nodes.size(); i++) {
+	fprintf(f_edges,"\tnode [\n");
+	fprintf(f_edges,"\t\tid %d\n",i);
+	fprintf(f_edges,"\t\tlabel \"");
+	set<pos>::iterator sit = nodes[i].positions.begin();
+	if (sit!=nodes[i].positions.end()) {
+	fprintf(f_edges,"%llu%c",sit->contigpos,sit->strand);
 	}
 	sit++;
-	for (; sit != nodes[e.start].positions.end(); sit++) {
-	    fprintf(f_edges, ",%llu%c", sit->contigpos, sit->strand);
+	for ( ; sit!=nodes[i].positions.end(); sit++) {
+	fprintf(f_edges,",%llu%c",sit->contigpos,sit->strand);
 	}
-	fprintf(f_edges, "]");
-	//print orientation
-	char orientation[3] = "oo";
-	if (e.from_bit) {
-	    orientation[0] = 'i';
+	fprintf(f_edges,"\"\n");
+	fprintf(f_edges,"\t]\n");
 	}
-	if (e.to_bit) {
-	    orientation[1] = 'i';
-	}
-	orientation[2] = '\0';
-	fprintf(f_edges, "\t%s\t", orientation);
-	//Print second node
-	fprintf(f_edges, "%d[", e.end);
-	sit = nodes[e.end].positions.begin();
-	if (sit != nodes[e.end].positions.end()) {
-	    fprintf(f_edges, "%llu%c", sit->contigpos, sit->strand);
-	}
-	sit++;
-	for (; sit != nodes[e.end].positions.end(); sit++) {
-	    fprintf(f_edges, ",%llu%c", sit->contigpos, sit->strand);
-	}
-	fprintf(f_edges, "]");
-	//Print type
-	fprintf(f_edges, "\t%d\t%u\t%u\t%llu\n", e.type, e.from_bit,
-		e.to_bit, e.length);
-    }
-
-    fclose(f_edges);
 
 
-    //PRINT IN SIF and EDGE ATTRIB FORMAT 
+	for (int i=0; i<edges.size(); i++) {
+	char oreintation[3]="oo";
+	if (edges[i].from_bit) {
+	oreintation[0]='i';
+	}
+	if (edges[i].to_bit) {
+	oreintation[1]='i';
+	}
+	oreintation[2]='\0';
+	fprintf(f_edges,"\tedge [\n");
+	fprintf(f_edges,"\t\tsource %llu\n",edges[i].start);
+	fprintf(f_edges,"\t\ttarget %llu\n",edges[i].end);
+	fprintf(f_edges,"\t\tTYPE %s\n",oreintation);
+	//fprintf(f_edges,"%llu %s %llu\n",edges[i].start,orientation,edges[i].end);
+	fprintf(f_edges,"\t]\n");
+	}
 
-    fprintf(f_ea, "TYPE (class=java.lang.Integer)\n");
-    fprintf(f_fa, "TYPE (class=java.lang.Integer) NODES=%llu\n",
-	    nodes.size());
-    it = edges.begin();
-    for (; it != edges.end(); it++) {
-	edge e = it->second;
-	uint64_t edge_index = it->first;
-	//Print first node
-	fprintf(f_sif, "%d[", e.start);
-	fprintf(f_ea, "%d[", e.start);
-	fprintf(f_fa, "%d[", e.start);
-	set < pos >::iterator sit = nodes[e.start].positions.begin();
-	if (sit != nodes[e.start].positions.end()) {
-	    fprintf(f_sif, "%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_ea, "%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_fa, "%llu%c", sit->contigpos, sit->strand);
-	}
-	sit++;
-	for (; sit != nodes[e.start].positions.end(); sit++) {
-	    fprintf(f_sif, ",%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_ea, ",%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_fa, ",%llu%c", sit->contigpos, sit->strand);
-	}
-	fprintf(f_sif, "]");
-	fprintf(f_ea, "]");
-	fprintf(f_fa, "]");
-	//print orientation
-	char orientation[3] = "oo";
-	if (e.from_bit) {
-	    orientation[0] = 'i';
-	}
-	if (e.to_bit) {
-	    orientation[1] = 'i';
-	}
-	orientation[2] = '\0';
-	fprintf(f_sif, " %s ", orientation);
-	fprintf(f_ea, " (%s) ", orientation);
-	fprintf(f_fa, " (%s) ", orientation);
-	//Print second node
-	fprintf(f_sif, "%d[", e.end);
-	fprintf(f_ea, "%d[", e.end);
-	fprintf(f_fa, "%d[", e.end);
-	sit = nodes[e.end].positions.begin();
-	if (sit != nodes[e.end].positions.end()) {
-	    fprintf(f_sif, "%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_ea, "%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_fa, "%llu%c", sit->contigpos, sit->strand);
-	}
-	sit++;
-	for (; sit != nodes[e.end].positions.end(); sit++) {
-	    fprintf(f_sif, ",%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_ea, ",%llu%c", sit->contigpos, sit->strand);
-	    fprintf(f_fa, ",%llu%c", sit->contigpos, sit->strand);
-	}
-	fprintf(f_sif, "]\n");
-	fprintf(f_ea, "]");
-	fprintf(f_fa, "]");
-	//Print type
-	fprintf(f_ea, " = %d\n", e.type);
-	fprintf(f_fa, " = E%llu\n", edge_index);
-    }
+	fprintf(f_edges,"]\n"); */
 
-    fclose(f_sif);
-    fclose(f_ea);
-    fclose(f_fa);
+
+	//PRINT IN TABLE FORMAT
+	fprintf(f_edges, "SOURCE\tinteraction\tDESTINATION\tTYPE\n");
+	map < uint64_t, edge >::iterator it = edges.begin();
+	for (; it != edges.end(); it++) {
+		edge e = it->second;
+		//Print first node
+		fprintf(f_edges, "%d[", e.start);
+		set < pos >::iterator sit = nodes[e.start].positions.begin();
+		if (sit != nodes[e.start].positions.end()) {
+			fprintf(f_edges, "%llu%c", sit->contigpos, sit->strand);
+		}
+		sit++;
+		for (; sit != nodes[e.start].positions.end(); sit++) {
+			fprintf(f_edges, ",%llu%c", sit->contigpos, sit->strand);
+		}
+		fprintf(f_edges, "]");
+		//print orientation
+		char orientation[3] = "oo";
+		if (e.from_bit) {
+			orientation[0] = 'i';
+		}
+		if (e.to_bit) {
+			orientation[1] = 'i';
+		}
+		orientation[2] = '\0';
+		fprintf(f_edges, "\t%s\t", orientation);
+		//Print second node
+		fprintf(f_edges, "%d[", e.end);
+		sit = nodes[e.end].positions.begin();
+		if (sit != nodes[e.end].positions.end()) {
+			fprintf(f_edges, "%llu%c", sit->contigpos, sit->strand);
+		}
+		sit++;
+		for (; sit != nodes[e.end].positions.end(); sit++) {
+			fprintf(f_edges, ",%llu%c", sit->contigpos, sit->strand);
+		}
+		fprintf(f_edges, "]");
+		//Print type
+		fprintf(f_edges, "\t%d\t%u\t%u\t%llu\n", e.type, e.from_bit,
+				e.to_bit, e.length);
+	}
+
+	fclose(f_edges);
+
+
+	//PRINT IN SIF and EDGE ATTRIB FORMAT 
+
+	fprintf(f_ea, "TYPE (class=java.lang.Integer)\n");
+	fprintf(f_fa, "TYPE (class=java.lang.Integer) NODES=%llu\n",
+			nodes.size());
+	it = edges.begin();
+	for (; it != edges.end(); it++) {
+		edge e = it->second;
+		uint64_t edge_index = it->first;
+		//Print first node
+		fprintf(f_sif, "%d[", e.start);
+		fprintf(f_ea, "%d[", e.start);
+		fprintf(f_fa, "%d[", e.start);
+		set < pos >::iterator sit = nodes[e.start].positions.begin();
+		if (sit != nodes[e.start].positions.end()) {
+			fprintf(f_sif, "%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_ea, "%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_fa, "%llu%c", sit->contigpos, sit->strand);
+		}
+		sit++;
+		for (; sit != nodes[e.start].positions.end(); sit++) {
+			fprintf(f_sif, ",%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_ea, ",%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_fa, ",%llu%c", sit->contigpos, sit->strand);
+		}
+		fprintf(f_sif, "]");
+		fprintf(f_ea, "]");
+		fprintf(f_fa, "]");
+		//print orientation
+		char orientation[3] = "oo";
+		if (e.from_bit) {
+			orientation[0] = 'i';
+		}
+		if (e.to_bit) {
+			orientation[1] = 'i';
+		}
+		orientation[2] = '\0';
+		fprintf(f_sif, " %s ", orientation);
+		fprintf(f_ea, " (%s) ", orientation);
+		fprintf(f_fa, " (%s) ", orientation);
+		//Print second node
+		fprintf(f_sif, "%d[", e.end);
+		fprintf(f_ea, "%d[", e.end);
+		fprintf(f_fa, "%d[", e.end);
+		sit = nodes[e.end].positions.begin();
+		if (sit != nodes[e.end].positions.end()) {
+			fprintf(f_sif, "%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_ea, "%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_fa, "%llu%c", sit->contigpos, sit->strand);
+		}
+		sit++;
+		for (; sit != nodes[e.end].positions.end(); sit++) {
+			fprintf(f_sif, ",%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_ea, ",%llu%c", sit->contigpos, sit->strand);
+			fprintf(f_fa, ",%llu%c", sit->contigpos, sit->strand);
+		}
+		fprintf(f_sif, "]\n");
+		fprintf(f_ea, "]");
+		fprintf(f_fa, "]");
+		//Print type
+		fprintf(f_ea, " = %d\n", e.type);
+		fprintf(f_fa, " = E%llu\n", edge_index);
+	}
+
+	fclose(f_sif);
+	fclose(f_ea);
+	fclose(f_fa);
 
 
 }
@@ -498,113 +498,113 @@ void write_out(map < uint64_t, edge > &edges, map < uint64_t,
 
 
 uint64_t split_edge(uint64_t edgeindex, uint64_t offset,
-		    uint64_t * num_edges, map < uint64_t, edge > &edges,
-		    uint64_t * num_nodes, map < uint64_t, node > &nodes,
-		    map < pos, uint64_t > &pos2edge)
+		uint64_t * num_edges, map < uint64_t, edge > &edges,
+		uint64_t * num_nodes, map < uint64_t, node > &nodes,
+		map < pos, uint64_t > &pos2edge)
 {
-    assert(offset > 0);
-    /* Create new edge */
-    uint64_t newedgeindex = (*num_edges)++;
-    edges[newedgeindex] = edge();
-    edges[newedgeindex].type = edges[edgeindex].type;
-    edges[newedgeindex].start = (*num_nodes)++;
-    edges[newedgeindex].end = edges[edgeindex].end;
-    edges[edgeindex].end = (*num_nodes)++;
+	assert(offset > 0);
+	/* Create new edge */
+	uint64_t newedgeindex = (*num_edges)++;
+	edges[newedgeindex] = edge();
+	edges[newedgeindex].type = edges[edgeindex].type;
+	edges[newedgeindex].start = (*num_nodes)++;
+	edges[newedgeindex].end = edges[edgeindex].end;
+	edges[edgeindex].end = (*num_nodes)++;
 
-    //printf("Created new nodes %llu and %llu\n",edges[edgeindex].end,edges[newedgeindex].start);
-    /* set the new lengths of edges */
-    edges[newedgeindex].length = edges[edgeindex].length - offset;
-    edges[edgeindex].length = offset;
+	//printf("Created new nodes %llu and %llu\n",edges[edgeindex].end,edges[newedgeindex].start);
+	/* set the new lengths of edges */
+	edges[newedgeindex].length = edges[edgeindex].length - offset;
+	edges[edgeindex].length = offset;
 
 
-    /* Split positive and negative strand nodes  */
-    set < pos > positions = nodes[edges[edgeindex].start].positions;
-    set < pos >::iterator iter = positions.begin();
-    while (iter != positions.end()) {
-	pos oldpos = *iter;
-	if (POSSTRAND(&oldpos)) {
-	    pos newpos_oldedge(oldpos.contig,
-			       oldpos.contigpos + edges[edgeindex].length -
-			       1, oldpos.strand, false);
-	    pos newpos_newedge(oldpos.contig,
-			       oldpos.contigpos + edges[edgeindex].length,
-			       oldpos.strand, true);
-	    nodes[edges[edgeindex].end].positions.insert(newpos_oldedge);
-	    nodes[edges[newedgeindex].start].positions.
-		insert(newpos_newedge);
-	    pos2edge[newpos_newedge] = newedgeindex;
-	}
-	++iter;
-    }
-
-    positions = nodes[edges[newedgeindex].end].positions;
-    iter = positions.begin();
-    while (iter != positions.end()) {
-	pos oldpos = *iter;
-	if (!POSSTRAND(&oldpos)) {
-	    pos newpos_newedge(oldpos.contig,
-			       oldpos.contigpos +
-			       (edges[newedgeindex].length) - 1,
-			       oldpos.strand, false);
-	    pos newpos_oldedge(oldpos.contig,
-			       oldpos.contigpos +
-			       (edges[newedgeindex].length), oldpos.strand,
-			       true);
-	    nodes[edges[edgeindex].end].positions.insert(newpos_oldedge);
-	    nodes[edges[newedgeindex].start].positions.
-		insert(newpos_newedge);
-	    pos2edge[newpos_oldedge] = edgeindex;
-	    pos2edge[oldpos] = newedgeindex;
+	/* Split positive and negative strand nodes  */
+	set < pos > positions = nodes[edges[edgeindex].start].positions;
+	set < pos >::iterator iter = positions.begin();
+	while (iter != positions.end()) {
+		pos oldpos = *iter;
+		if (POSSTRAND(&oldpos)) {
+			pos newpos_oldedge(oldpos.contig,
+					oldpos.contigpos + edges[edgeindex].length -
+					1, oldpos.strand, false);
+			pos newpos_newedge(oldpos.contig,
+					oldpos.contigpos + edges[edgeindex].length,
+					oldpos.strand, true);
+			nodes[edges[edgeindex].end].positions.insert(newpos_oldedge);
+			nodes[edges[newedgeindex].start].positions.
+				insert(newpos_newedge);
+			pos2edge[newpos_newedge] = newedgeindex;
+		}
+		++iter;
 	}
 
-	++iter;
-    }
+	positions = nodes[edges[newedgeindex].end].positions;
+	iter = positions.begin();
+	while (iter != positions.end()) {
+		pos oldpos = *iter;
+		if (!POSSTRAND(&oldpos)) {
+			pos newpos_newedge(oldpos.contig,
+					oldpos.contigpos +
+					(edges[newedgeindex].length) - 1,
+					oldpos.strand, false);
+			pos newpos_oldedge(oldpos.contig,
+					oldpos.contigpos +
+					(edges[newedgeindex].length), oldpos.strand,
+					true);
+			nodes[edges[edgeindex].end].positions.insert(newpos_oldedge);
+			nodes[edges[newedgeindex].start].positions.
+				insert(newpos_newedge);
+			pos2edge[newpos_oldedge] = edgeindex;
+			pos2edge[oldpos] = newedgeindex;
+		}
+
+		++iter;
+	}
 
 #ifdef DUMP
-    //write_out(edges,nodes,"./splitter.edges");
+	//write_out(edges,nodes,"./splitter.edges");
 #endif
-    return edges[newedgeindex].start;
+	return edges[newedgeindex].start;
 
 }
 
 map < pos, uint64_t >::iterator make_pos(pos & check_pos,
-					 uint64_t * num_edges,
-					 map < uint64_t, edge > &edges,
-					 uint64_t * num_nodes,
-					 map < uint64_t, node > &nodes,
-					 map < pos, uint64_t > &pos2edge)
+		uint64_t * num_edges,
+		map < uint64_t, edge > &edges,
+		uint64_t * num_nodes,
+		map < uint64_t, node > &nodes,
+		map < pos, uint64_t > &pos2edge)
 {
-    map < pos, uint64_t >::iterator edge_it =
-	pos2edge.lower_bound(check_pos);
-    if (edge_it == pos2edge.end() || !(check_pos == edge_it->first)) {
-	--edge_it;
-	pos p = edge_it->first;
-	uint64_t edgeindex = edge_it->second;
-	uint64_t offset = check_pos.contigpos - p.contigpos;
-	if (!POSSTRAND(&p)) {
-	    offset = edges[edgeindex].length - offset;
+	map < pos, uint64_t >::iterator edge_it =
+		pos2edge.lower_bound(check_pos);
+	if (edge_it == pos2edge.end() || !(check_pos == edge_it->first)) {
+		--edge_it;
+		pos p = edge_it->first;
+		uint64_t edgeindex = edge_it->second;
+		uint64_t offset = check_pos.contigpos - p.contigpos;
+		if (!POSSTRAND(&p)) {
+			offset = edges[edgeindex].length - offset;
+		}
+		//printf("Splitting %llu %llu\n",edgeindex,offset);
+		uint64_t new_node =
+			split_edge(edgeindex, offset, num_edges, edges, num_nodes,
+					nodes, pos2edge);
+		//printf("NEW NODE %llu\n",new_node);
+		edge_it = pos2edge.lower_bound(check_pos);
 	}
-	//printf("Splitting %llu %llu\n",edgeindex,offset);
-	uint64_t new_node =
-	    split_edge(edgeindex, offset, num_edges, edges, num_nodes,
-		       nodes, pos2edge);
-	//printf("NEW NODE %llu\n",new_node);
-	edge_it = pos2edge.lower_bound(check_pos);
-    }
-    assert(edge_it->first == check_pos);
-    return edge_it;
+	assert(edge_it->first == check_pos);
+	return edge_it;
 }
 
 
 double get_expected(double* lambdas,uint64_t start,uint64_t end) {
 	double result=0.0;
 	while(start<=end) {
-		assert(lambdas[start-1]>0.0);
+		//assert(lambdas[start-1]>0.0);
 		result+=lambdas[start-1];
 		start++;
 	}
 	return result;
-	
+
 }
 
 /* Fills in a sorted repeat graph */

@@ -62,6 +62,7 @@ public:
 			delete inf;
 		}
 	}
+	string getLastReadName() { return lastReadName; } //this is only supported with bam input
 
 private:
 	string input_format;

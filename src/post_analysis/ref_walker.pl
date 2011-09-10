@@ -62,13 +62,12 @@ while (my $line = <STDIN>) {
 
 	my $intlen = $to - $from + 1;
 
-	$retval = execCommand("$CNVER_FOLDER/src/post_analysis/edge_walker $graphinfo_file $problemout_file $from $to | grep E: | tr ':' ' ' | tr ',' ' ' | awk -v OFS=\"\\t\" '{ if (\$21 > 0) rat=int(100*\$15/\$21)/100; else rat = 0; print \$9, \$13, \$17, \$19,  rat, \$6, \$3, \$4 }'");
+	# $13 is the ref flow, $17 is the length, $6 is the end position of the segment relative to the query beginning
+	my $count = execCommand("$CNVER_FOLDER/src/post_analysis/edge_walker $graphinfo_file $problemout_file $from $to | grep E: | tr ':,' ' ' | awk '{ if (\$6 > -1) tot = tot + \$13 * \$17 } END { print tot / $intlen; }' ");
+	print "$line\t$count\n";
 
-	my $count = () = $retval =~ /\n/g;  
+	#$retval = execCommand("$CNVER_FOLDER/src/post_analysis/edge_walker $graphinfo_file $problemout_file $from $to | grep E: | tr ':,' ' ' | awk '{ if (\$21 > 0) rat=int(100*\$15/\$21)/100; else rat = 0; print \$9, \$13, \$17, \$19,  rat, \$6, \$3, \$4 }' | awk '{ if (\$6 != -1) { tot = tot + \$2 * ((\$8 - \$7 + 1)/$intlen); } } END { print tot; }' ");
 
-	$retval = execCommand("$CNVER_FOLDER/src/post_analysis/edge_walker $graphinfo_file $problemout_file $from $to | grep E: | tr ':' ' ' | tr ',' ' ' | awk -v OFS=\"\\t\" '{ if (\$21 > 0) rat=int(100*\$15/\$21)/100; else rat = 0; print \$9, \$13, \$17, \$19,  rat, \$6, \$3, \$4 }' | awk '{ if (\$6 != -1) { tot = tot + \$2 * ((\$8 - \$7 + 1)/$intlen); } } END { print tot; }' ");
-
-	print "$line\t$retval\t$count\n";
 
 	$callnum++;
 }

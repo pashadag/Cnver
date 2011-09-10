@@ -34,13 +34,13 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = interval_join$(EXEEXT) axt_to_binary$(EXEEXT) \
+bin_PROGRAMS = interval_join$(EXEEXT) glue2graph$(EXEEXT) \
 	fill_reference_graph$(EXEEXT) make_gc_map$(EXEEXT) \
 	report_cnvs$(EXEEXT) maps2bin$(EXEEXT) find_spikes$(EXEEXT) \
 	make_reference_graph$(EXEEXT) make_donor_graph$(EXEEXT) \
 	make_simple_coverage$(EXEEXT) interleave_bam$(EXEEXT) \
 	readbin$(EXEEXT) make_ns$(EXEEXT) find_mean_sd$(EXEEXT) \
-	intRemove2$(EXEEXT)
+	intRemove2$(EXEEXT) filter_axt$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -53,12 +53,12 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_axt_to_binary_OBJECTS = axt_to_binary.$(OBJEXT)
-axt_to_binary_OBJECTS = $(am_axt_to_binary_OBJECTS)
-axt_to_binary_LDADD = $(LDADD)
 am_fill_reference_graph_OBJECTS = fill_reference_graph.$(OBJEXT)
 fill_reference_graph_OBJECTS = $(am_fill_reference_graph_OBJECTS)
 fill_reference_graph_LDADD = $(LDADD)
+am_filter_axt_OBJECTS = filter_axt.$(OBJEXT)
+filter_axt_OBJECTS = $(am_filter_axt_OBJECTS)
+filter_axt_LDADD = $(LDADD)
 am_find_mean_sd_OBJECTS = find_mean_sd.$(OBJEXT) BGZF.$(OBJEXT) \
 	BamReader.$(OBJEXT) BamWriter.$(OBJEXT)
 find_mean_sd_OBJECTS = $(am_find_mean_sd_OBJECTS)
@@ -66,6 +66,9 @@ find_mean_sd_LDADD = $(LDADD)
 am_find_spikes_OBJECTS = find_spikes.$(OBJEXT)
 find_spikes_OBJECTS = $(am_find_spikes_OBJECTS)
 find_spikes_LDADD = $(LDADD)
+am_glue2graph_OBJECTS = glue2graph.$(OBJEXT)
+glue2graph_OBJECTS = $(am_glue2graph_OBJECTS)
+glue2graph_LDADD = $(LDADD)
 am_intRemove2_OBJECTS = intRemove2.$(OBJEXT)
 intRemove2_OBJECTS = $(am_intRemove2_OBJECTS)
 intRemove2_LDADD = $(LDADD)
@@ -113,17 +116,17 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(axt_to_binary_SOURCES) $(fill_reference_graph_SOURCES) \
+SOURCES = $(fill_reference_graph_SOURCES) $(filter_axt_SOURCES) \
 	$(find_mean_sd_SOURCES) $(find_spikes_SOURCES) \
-	$(intRemove2_SOURCES) $(interleave_bam_SOURCES) \
-	$(interval_join_SOURCES) $(make_donor_graph_SOURCES) \
-	$(make_gc_map_SOURCES) $(make_ns_SOURCES) \
-	$(make_reference_graph_SOURCES) \
+	$(glue2graph_SOURCES) $(intRemove2_SOURCES) \
+	$(interleave_bam_SOURCES) $(interval_join_SOURCES) \
+	$(make_donor_graph_SOURCES) $(make_gc_map_SOURCES) \
+	$(make_ns_SOURCES) $(make_reference_graph_SOURCES) \
 	$(make_simple_coverage_SOURCES) $(maps2bin_SOURCES) \
 	$(readbin_SOURCES) $(report_cnvs_SOURCES)
-DIST_SOURCES = $(axt_to_binary_SOURCES) \
-	$(fill_reference_graph_SOURCES) $(find_mean_sd_SOURCES) \
-	$(find_spikes_SOURCES) $(intRemove2_SOURCES) \
+DIST_SOURCES = $(fill_reference_graph_SOURCES) $(filter_axt_SOURCES) \
+	$(find_mean_sd_SOURCES) $(find_spikes_SOURCES) \
+	$(glue2graph_SOURCES) $(intRemove2_SOURCES) \
 	$(interleave_bam_SOURCES) $(interval_join_SOURCES) \
 	$(make_donor_graph_SOURCES) $(make_gc_map_SOURCES) \
 	$(make_ns_SOURCES) $(make_reference_graph_SOURCES) \
@@ -222,7 +225,8 @@ maps2bin_SOURCES = maps2bin.cpp bamtools/BamAux.h bamtools/zlib.h bamtools/zconf
 #maps2bin_LDADD=-lz
 interleave_bam_SOURCES = interleave_bam.cpp bamtools/BamAux.h bamtools/zlib.h bamtools/zconf.h bamtools/BGZF.cpp bamtools/BamReader.cpp bamtools/BamWriter.cpp 
 #interleave_bam_LDADD=-lz
-axt_to_binary_SOURCES = axt_to_binary.c include/graphtypes.h
+glue2graph_SOURCES = glue2graph.cpp include/graphtypes.h include/defs.h
+filter_axt_SOURCES = filter_axt.cpp include/defs.h include/dbtypes.h
 fill_reference_graph_SOURCES = fill_reference_graph.c include/graphtypes.h
 make_gc_map_SOURCES = make_gc_map.cpp include/dbtypes.h include/defs.h
 report_cnvs_SOURCES = report_cnvs.cpp include/dbtypes.h include/graphtypes.h
@@ -289,18 +293,21 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-axt_to_binary$(EXEEXT): $(axt_to_binary_OBJECTS) $(axt_to_binary_DEPENDENCIES) 
-	@rm -f axt_to_binary$(EXEEXT)
-	$(LINK) $(axt_to_binary_LDFLAGS) $(axt_to_binary_OBJECTS) $(axt_to_binary_LDADD) $(LIBS)
 fill_reference_graph$(EXEEXT): $(fill_reference_graph_OBJECTS) $(fill_reference_graph_DEPENDENCIES) 
 	@rm -f fill_reference_graph$(EXEEXT)
 	$(LINK) $(fill_reference_graph_LDFLAGS) $(fill_reference_graph_OBJECTS) $(fill_reference_graph_LDADD) $(LIBS)
+filter_axt$(EXEEXT): $(filter_axt_OBJECTS) $(filter_axt_DEPENDENCIES) 
+	@rm -f filter_axt$(EXEEXT)
+	$(CXXLINK) $(filter_axt_LDFLAGS) $(filter_axt_OBJECTS) $(filter_axt_LDADD) $(LIBS)
 find_mean_sd$(EXEEXT): $(find_mean_sd_OBJECTS) $(find_mean_sd_DEPENDENCIES) 
 	@rm -f find_mean_sd$(EXEEXT)
 	$(CXXLINK) $(find_mean_sd_LDFLAGS) $(find_mean_sd_OBJECTS) $(find_mean_sd_LDADD) $(LIBS)
 find_spikes$(EXEEXT): $(find_spikes_OBJECTS) $(find_spikes_DEPENDENCIES) 
 	@rm -f find_spikes$(EXEEXT)
 	$(LINK) $(find_spikes_LDFLAGS) $(find_spikes_OBJECTS) $(find_spikes_LDADD) $(LIBS)
+glue2graph$(EXEEXT): $(glue2graph_OBJECTS) $(glue2graph_DEPENDENCIES) 
+	@rm -f glue2graph$(EXEEXT)
+	$(CXXLINK) $(glue2graph_LDFLAGS) $(glue2graph_OBJECTS) $(glue2graph_LDADD) $(LIBS)
 intRemove2$(EXEEXT): $(intRemove2_OBJECTS) $(intRemove2_DEPENDENCIES) 
 	@rm -f intRemove2$(EXEEXT)
 	$(CXXLINK) $(intRemove2_LDFLAGS) $(intRemove2_OBJECTS) $(intRemove2_LDADD) $(LIBS)
@@ -344,10 +351,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BGZF.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BamReader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BamWriter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/axt_to_binary.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fill_reference_graph.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filter_axt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/find_mean_sd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/find_spikes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glue2graph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/intRemove2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interleave_bam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_join.Po@am__quote@

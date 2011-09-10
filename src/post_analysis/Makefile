@@ -35,7 +35,7 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = doc_walker$(EXEEXT) edge_walker$(EXEEXT) \
-	bestOverlap$(EXEEXT) gcContent$(EXEEXT)
+	bestOverlap$(EXEEXT) gcContent$(EXEEXT) alSignal$(EXEEXT)
 subdir = src/post_analysis
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -48,6 +48,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
+am_alSignal_OBJECTS = alSignal.$(OBJEXT)
+alSignal_OBJECTS = $(am_alSignal_OBJECTS)
+alSignal_LDADD = $(LDADD)
 am_bestOverlap_OBJECTS = bestOverlap.$(OBJEXT)
 bestOverlap_OBJECTS = $(am_bestOverlap_OBJECTS)
 bestOverlap_LDADD = $(LDADD)
@@ -72,10 +75,12 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(bestOverlap_SOURCES) $(doc_walker_SOURCES) \
-	$(edge_walker_SOURCES) $(gcContent_SOURCES)
-DIST_SOURCES = $(bestOverlap_SOURCES) $(doc_walker_SOURCES) \
-	$(edge_walker_SOURCES) $(gcContent_SOURCES)
+SOURCES = $(alSignal_SOURCES) $(bestOverlap_SOURCES) \
+	$(doc_walker_SOURCES) $(edge_walker_SOURCES) \
+	$(gcContent_SOURCES)
+DIST_SOURCES = $(alSignal_SOURCES) $(bestOverlap_SOURCES) \
+	$(doc_walker_SOURCES) $(edge_walker_SOURCES) \
+	$(gcContent_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -158,6 +163,7 @@ doc_walker_SOURCES = doc_walker.cpp ../include/interval.h
 edge_walker_SOURCES = edge_walker.cpp
 bestOverlap_SOURCES = bestOverlap.cpp ../include/interval.h
 gcContent_SOURCES = gcContent.cpp ../include/interval.h ../include/defs.h
+alSignal_SOURCES = alSignal.cpp ../include/interval.h ../include/defs.h
 EXTRA_DIST = segment_walker.pl cluster_info.pl ref_walker.pl
 all: all-am
 
@@ -215,6 +221,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+alSignal$(EXEEXT): $(alSignal_OBJECTS) $(alSignal_DEPENDENCIES) 
+	@rm -f alSignal$(EXEEXT)
+	$(CXXLINK) $(alSignal_LDFLAGS) $(alSignal_OBJECTS) $(alSignal_LDADD) $(LIBS)
 bestOverlap$(EXEEXT): $(bestOverlap_OBJECTS) $(bestOverlap_DEPENDENCIES) 
 	@rm -f bestOverlap$(EXEEXT)
 	$(CXXLINK) $(bestOverlap_LDFLAGS) $(bestOverlap_OBJECTS) $(bestOverlap_LDADD) $(LIBS)
@@ -234,6 +243,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/alSignal.Po
 include ./$(DEPDIR)/bestOverlap.Po
 include ./$(DEPDIR)/doc_walker.Po
 include ./$(DEPDIR)/edge_walker.Po

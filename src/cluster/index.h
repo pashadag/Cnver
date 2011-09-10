@@ -122,7 +122,6 @@ pType rewind(ifstream &dataFile, pType index, const T & val) {
 
 
 
-
 template<class T>
 long binary_search_without_index(ifstream &dataFile, const T & val, int64_t first, int64_t last) {
 	//cout << "calling binary search with " << first << " " << last << endl;

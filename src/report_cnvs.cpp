@@ -473,7 +473,7 @@ int main(int argc, char ** argv)
 				if (flow_count != 0.0)
 				{
 					/* Print out the edge info */
-					printf("DG %s %llu %llu %d %f\n",
+					printf("%s %llu %llu %d %f\n",
 							donor_edges[cur_edge].contig.c_str(),
 							donor_edges[cur_edge].start,
 							donor_edges[cur_edge].end,

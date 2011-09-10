@@ -8,14 +8,19 @@
 string sbuf;
 FILE *f;
 FILE *g;
+bool concise = false;
 
-void process_interval(Interval i) {
-	double * fs= (double*)malloc(sizeof(double) * (i.end - i.start + 1));
+bool process_interval(Interval i) {
+	long range = i.end - i.start + 1;
+	if (range <= 0) return false;
+
+
+	double * fs= (double*)malloc(sizeof(double) * range);
 	if (fs==NULL) {
 		printf("Cannot malloc mem\n");
 		exit(1);
 	}
-	double * gs= (double*)malloc(sizeof(double) * (i.end - i.start + 1));
+	double * gs= (double*)malloc(sizeof(double) * range);
 	if (gs==NULL) {
 		printf("Cannot malloc mem\n");
 		exit(1);
@@ -24,19 +29,31 @@ void process_interval(Interval i) {
 
 	long go_to = (i.start - 1) * sizeof(double);
 	int res = fseek(f, go_to, SEEK_SET);
-	assert(res == 0);
+	if (res != 0) {
+		cerr << "doc_walker: error at interval " << i << endl;
+		exit(1);
+	}
 	res = fseek(g, go_to, SEEK_SET);
-	assert(res == 0);
-	res = fread(fs, sizeof(double) * (i.end - i.start + 1), 1, f);
-	assert(res == 1);
-	res = fread(gs, sizeof(double) * (i.end - i.start + 1), 1, g);
-	assert(res == 1);
+	if (res != 0) {
+		cerr << "doc_walker: error at interval " << i << endl;
+		exit(1);
+	}
+	res = fread(fs, sizeof(double) * range, 1, f);
+	if (res != 1) {
+		cerr << "doc_walker: error at interval " << i << endl;
+		exit(1);
+	}
+	res = fread(gs, sizeof(double) * range, 1, g);
+	if (res != 1) {
+		cerr << "doc_walker: error at interval " << i << endl;
+		exit(1);
+	}
 	double sum_unmasked = 0.0;
 	double sum_masked = 0.0;
 	double sum_expected = 0.0;
 	int masked = 0;
 	int index = 0;
-	while (index < i.end - i.start + 1) {
+	while (index < range) {
 		//printf("%d\t%.4f\t%.4f\n",index+start,fs[index],gs[index]);
 		sum_unmasked += fs[index];
 		if (gs[index] > 0.0) {
@@ -49,9 +66,14 @@ void process_interval(Interval i) {
 	}
 	double doc_ratio = (double) sum_masked / (double) sum_expected;
 	cout << i << "\t";
-	printf ("DOC_ratio:\t%.4f\tObserved_coverage:\t%.4f\tExpected_coverage:\t%.4f\tNum_masked_positions:\t%d\tObserved_coverage_including_masked_regions:\t%.4f\n", doc_ratio, sum_masked, sum_expected, masked, sum_unmasked);
+	if (concise) {
+		printf ("%.4f\n", doc_ratio);
+	} else{
+		printf ("DOC_ratio:\t%.4f\tObserved_coverage:\t%.4f\tExpected_coverage:\t%.4f\tNum_masked_positions:\t%d\tObserved_coverage_including_masked_regions:\t%.4f\n", doc_ratio, sum_masked, sum_expected, masked, sum_unmasked);
+	}
 	delete fs;
 	delete gs;
+	return true;
 
 }
 
@@ -61,8 +83,16 @@ int main(int argc, char** argv) {
 	if (argc == 5) {
 		start = atoi(argv[3]);
 		end   = atoi(argv[4]);
+	} else if (argc == 6) {
+		start = atoi(argv[3]);
+		end   = atoi(argv[4]);
+		concise = true;
+		cerr << "Using option " << argv[5] << endl;
+	} else if (argc == 4) {
+		concise = true;
+		cerr << "Using option " << argv[3] << endl;
 	} else if (argc != 3) {
-		printf("%s scov_file gc_file start end\n", argv[0]);
+		printf("%s scov_file gc_file [start end] [concise] \n", argv[0]);
 		printf("The .scov and .gc files can be found in the work_dir.\n");
 		printf("If start/end is not specified, an interval file is taken as an input.\n");
 		exit(1);
@@ -82,7 +112,7 @@ int main(int argc, char** argv) {
 	if (start == -1) {
 		while (getline(cin, sbuf)) {
 			Interval i = read_interval(sbuf);
-			process_interval(i);
+			if (!process_interval(i)) cout << sbuf << endl;
 		}
 	} else {
 		process_interval(Interval("-1", start, end));

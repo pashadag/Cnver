@@ -20,7 +20,7 @@ sub execCommand {
 	$retval  = `$command`;
 	#print "\n";
 	if ( $? == -1 ) {
-		print "command failed: $!";
+		print "command \"$command\" failed: $!";
 	} 
 	#print $retval;
 	chomp $retval;
@@ -78,7 +78,9 @@ if ($category eq "cluster") {
 
 	for (my $i = 1; $i < scalar(@list_of_idx); $i++) {
 		my $rid = $list_of_idx[$i];
-		print "MAPPINGS $rid\n";
+		my $bam_name1 = execCommand("$CNVER_FOLDER/src/cluster/idx_lookup bamnames $mapping_files_folder/readNames.idx $rid");
+		my $bam_name2 = execCommand("$CNVER_FOLDER/src/cluster/idx_lookup bamnames $mapping_files_folder/readNames.idx " . ($rid + 1));
+		print "MAPPINGS\t$rid\t$bam_name1\t$bam_name2\n";
 		my $retval = execCommand("$CNVER_FOLDER/src/cluster/idx_lookup double $mapping_files_folder/$ref.mmap.idx $mapping_files_folder/$ref.mmap $rid");
 		print $retval;
 		print "\n\n";
@@ -88,6 +90,8 @@ if ($category eq "cluster") {
 	my $read_id = $ARGV[3];
 
 	open(REF_NAMES, $ref_name_file) or die("File $ref_name_file does not exist");
+	my $bam_name = execCommand("$CNVER_FOLDER/src/cluster/idx_lookup bamnames $mapping_files_folder/readNames.idx $read_id");
+	print "BAM_READNAME\t$bam_name\n";
 	while (<REF_NAMES>) {
 		chomp;
 		my $ref = $_;

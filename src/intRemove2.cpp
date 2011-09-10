@@ -48,6 +48,10 @@ int main(int argc, char * argv[]) {
 		//cout << "left: " << leftInt << "right: " << rightInt << flush << endl;
 		
 		res = lower_bound(badInts.begin(), badInts.end(), curInt, comp_le);
+		if (badInts.size() == 0) {
+			cout << sbuf << endl;
+			continue;
+		}
 
 		if (res != badInts.end() && !res->overlaps(curInt)) {
 			if (res != badInts.begin()) res--;

@@ -14,6 +14,8 @@ typedef struct {
     char        strand;
 } chr_pos_t;
 
+
+
 /* Position table entry */
 typedef struct {
     chr_pos_t               pos;
@@ -25,5 +27,6 @@ typedef struct map_entry_s {
     pos_entry_t           * entry;
     struct map_entry_s    * next;
 } map_entry_t;
+
 
 #endif /* !defined(__DBTYPES_H__) */
