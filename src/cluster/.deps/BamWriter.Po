@@ -14,7 +14,6 @@ BamWriter.o BamWriter.o: ../bamtools/BamWriter.cpp ../bamtools/BGZF.h \
   /usr/include/gconv.h \
   /usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/stdarg.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h \
   /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstdlib \
   /usr/include/stdlib.h /usr/include/bits/waitflags.h \
   /usr/include/bits/waitstatus.h /usr/include/endian.h \
@@ -140,8 +139,6 @@ BamWriter.o BamWriter.o: ../bamtools/BamWriter.cpp ../bamtools/BGZF.h \
 /usr/include/bits/stdio_lim.h:
 
 /usr/include/bits/sys_errlist.h:
-
-/usr/include/bits/stdio.h:
 
 /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstdlib:
 

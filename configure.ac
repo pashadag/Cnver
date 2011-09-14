@@ -1,6 +1,7 @@
 AC_INIT([cnver],[0.8.1],[cnver@cs.toronto.edu])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 CFLAGS='-std=c99'
+CXXFLAGS='-O0 -g'
 AC_PROG_CC
 AC_PROG_CXX
 AC_CONFIG_HEADERS([config.h])

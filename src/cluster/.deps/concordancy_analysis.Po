@@ -12,7 +12,6 @@ concordancy_analysis.o concordancy_analysis.o: concordancy_analysis.cpp \
   /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h \
   /usr/include/bits/inf.h /usr/include/bits/nan.h \
   /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h \
-  /usr/include/bits/mathinline.h \
   /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/cmath.tcc \
   /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstring \
   /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstddef \
@@ -30,7 +29,6 @@ concordancy_analysis.o concordancy_analysis.o: concordancy_analysis.cpp \
   /usr/include/gconv.h \
   /usr/lib/gcc/x86_64-redhat-linux/4.1.2/include/stdarg.h \
   /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h \
   /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/clocale \
   /usr/include/locale.h /usr/include/bits/locale.h \
   /usr/include/langinfo.h /usr/include/nl_types.h /usr/include/iconv.h \
@@ -184,8 +182,6 @@ concordancy_analysis.o concordancy_analysis.o: concordancy_analysis.cpp \
 
 /usr/include/bits/mathcalls.h:
 
-/usr/include/bits/mathinline.h:
-
 /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/bits/cmath.tcc:
 
 /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/cstring:
@@ -231,8 +227,6 @@ concordancy_analysis.o concordancy_analysis.o: concordancy_analysis.cpp \
 /usr/include/bits/stdio_lim.h:
 
 /usr/include/bits/sys_errlist.h:
-
-/usr/include/bits/stdio.h:
 
 /usr/lib/gcc/x86_64-redhat-linux/4.1.2/../../../../include/c++/4.1.2/clocale:
 

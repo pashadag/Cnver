@@ -156,7 +156,7 @@ CFLAGS = -std=c99
 CPPFLAGS = 
 CXX = g++
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -g -O2
+CXXFLAGS = -O0 -g
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -225,7 +225,7 @@ maps2bin_SOURCES = maps2bin.cpp bamtools/BamAux.h bamtools/zlib.h bamtools/zconf
 #maps2bin_LDADD=-lz
 interleave_bam_SOURCES = interleave_bam.cpp bamtools/BamAux.h bamtools/zlib.h bamtools/zconf.h bamtools/BGZF.cpp bamtools/BamReader.cpp bamtools/BamWriter.cpp 
 #interleave_bam_LDADD=-lz
-glue2graph_SOURCES = glue2graph.cpp include/graphtypes.h include/defs.h
+glue2graph_SOURCES = glue2graph.cpp include/graphtypes.h include/defs.h include/union.h
 filter_axt_SOURCES = filter_axt.cpp include/defs.h include/dbtypes.h
 fill_reference_graph_SOURCES = fill_reference_graph.c include/graphtypes.h
 make_gc_map_SOURCES = make_gc_map.cpp include/dbtypes.h include/defs.h

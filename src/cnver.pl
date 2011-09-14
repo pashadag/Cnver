@@ -237,7 +237,7 @@ MISC:
 
 	#Create the reference graphs
 	execCommand ("$CNVER_FOLDER/src/filter_axt $self_alignments_folder/$ref.axt $ref_length $work_fol/$ref.glue");
-	execCommand ("$CNVER_FOLDER/src/glue2graph $work_fol/$ref.glue $work_fol/$ref.edges");
+	execCommand ("$CNVER_FOLDER/src/glue2graph $work_fol/$ref.glue $work_fol/$ref.blocks $work_fol/$ref.edges");
 	execCommand ("$CNVER_FOLDER/src/make_reference_graph $work_fol/$ref.edges $work_fol/$ref.graph");
 	execCommand ("$CNVER_FOLDER/src/fill_reference_graph $work_fol/$ref.graph $ref_length");
 

@@ -102,6 +102,8 @@ int main(int argc, char ** argv)
         fgets(s2, MAX_SEQ_LEN, input);
         uint32_t s2len = strlen(s2) - 1;
         uint32_t minlen = (s1len < s2len ? s1len : s2len);
+		assert (strand == '+' || strand == '-');
+		bool inv = (strand == '-');
 
         /* Skip short alignments and different contigs */
         if ((minlen < WINDOW) || (strcmp(contigname1, contigname2))) {
@@ -151,14 +153,14 @@ int main(int argc, char ** argv)
 				uint64_t start1 = contigstart1 + window_start - s1gaps;
 				uint64_t end1   = contigstart1 + window_end - s1gaps;
 				uint64_t start2, end2;
-                if (strand == '+') {
+                if (!inv) {
                     start2 = contigstart2 + window_start - s2gaps;
                     end2   = contigstart2 + window_end - s2gaps;
                 } else {
                     start2 = contiglen - (contigstart2 + window_end - s2gaps) + 1;
                     end2   = contiglen - (contigstart2 + window_start - s2gaps) + 1;
                 }
-				outf << contigname1 << "\t" << start1 << "\t" << end1 << "\t" << contigname2 << "\t" << start2 << "\t" << end2 << "\t" << strand << endl;
+				outf << contigname1 << "\t" << start1 << "\t" << end1 << "\t" << contigname2 << "\t" << start2 << "\t" << end2 << "\t" << inv << endl;
 
                 skip = window_end - i;
                 window_start = -1;
@@ -187,14 +189,14 @@ int main(int argc, char ** argv)
 			uint64_t start1 = contigstart1 + window_start - s1gaps;
 			uint64_t end1   = contigstart1 + window_end - s1gaps;
 			uint64_t start2, end2;
-			if (strand == '+') {
+			if (!inv) {
 				start2 = contigstart2 + window_start - s2gaps;
 				end2   = contigstart2 + window_end - s2gaps;
 			} else {
 				start2 = contiglen - (contigstart2 + window_end - s2gaps) + 1;
 				end2   = contiglen - (contigstart2 + window_start - s2gaps) + 1;
 			}
-			outf << contigname1 << "\t" << start1 << "\t" << end1 << "\t" << contigname2 << "\t" << start2 << "\t" << end2 << "\t" << strand << endl;
+			outf << contigname1 << "\t" << start1 << "\t" << end1 << "\t" << contigname2 << "\t" << start2 << "\t" << end2 << "\t" << inv << endl;
         }    
         
         /* Skip extra newline) */

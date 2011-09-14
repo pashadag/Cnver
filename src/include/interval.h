@@ -134,7 +134,7 @@ ostream & operator << (ostream & out, const Interval & i) {
 	//out << i.chr << " " << i.start << " " << i.end;
 	//if (i.label != "") out << " " << i.label;
 	out << i.chr << "\t" << i.start << "\t" << i.end;
-	if (i.label != "") out <<  i.label;
+	if (i.label != "") out <<  "\t" << i.label;
 	return out;
 }
 

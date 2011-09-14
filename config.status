@@ -526,7 +526,7 @@ s,@CCDEPMODE@,depmode=gcc3,;t t
 s,@am__fastdepCC_TRUE@,,;t t
 s,@am__fastdepCC_FALSE@,#,;t t
 s,@CXX@,g++,;t t
-s,@CXXFLAGS@,-g -O2,;t t
+s,@CXXFLAGS@,-O0 -g,;t t
 s,@ac_ct_CXX@,g++,;t t
 s,@CXXDEPMODE@,depmode=gcc3,;t t
 s,@am__fastdepCXX_TRUE@,,;t t
