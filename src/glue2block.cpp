@@ -79,6 +79,7 @@ void searchRange(vector<int> & points, Interval range, int & start, int & end) {
 	}
 }
 
+//for debugging only
 void check_glue(Glue g) {
 	for (int i = 0; i < 2; i++) {
 		if (g.intv[i].start > g.intv[i].end) {
@@ -90,7 +91,6 @@ void check_glue(Glue g) {
 
 void split_glue(Glue g, vector<int> & bps, vector<Glue> & result, int main_idx = 0) {
 	Glue origGlue = g;
-	check_glue(g);
 	int sec_idx = abs(main_idx -1 );
 	
 	int bp_start, bp_end;
@@ -106,10 +106,8 @@ void split_glue(Glue g, vector<int> & bps, vector<Glue> & result, int main_idx =
 		g.intv[main_idx].start = bp;
 		newglue.intv[main_idx].end = g.intv[main_idx].start - 1;
 		newglue.intv[sec_idx].end = g.intv[sec_idx].start - 1;
-		check_glue(newglue);
 		result.push_back(newglue);
 	}
-	check_glue(g);
 	result.push_back(g);
 }
 
@@ -120,17 +118,21 @@ void split_glue(Glue g, vector<int> & bps, vector<Glue> & result, int main_idx =
 int main(int argc, char ** argv) {
 
 	/* Validate input, but not too much. */
-	if (argc != 4) {
-		fprintf(stderr, "usage: %s <glue_file> <block_file> <edge_file>\n", argv[0]);
+	if (argc != 6) {
+		fprintf(stderr, "usage: %s <chrom> <length> <glue_file> <block_file> <edge_file>\n", argv[0]);
 		return -1;
 	}
 
+	string chr = argv[1];
+	int    chrLen = atoi(argv[2]);
+
+
 	/* Open input and output files */
 	ifstream inf;
-	open_file(inf, argv[1]);
+	open_file(inf, argv[3]);
 	ofstream outf;
-	open_file(outf, argv[2]);
-	FILE * output = fopen(argv[3], "wb");
+	open_file(outf, argv[4]);
+	FILE * output = fopen(argv[5], "wb");
 	if (output == NULL) {
 		perror("opening input/output");
 		return -1;
@@ -184,11 +186,7 @@ int main(int argc, char ** argv) {
 	sort(bps.begin(), bps.end());
 	for (int i = 0; i < glues.size(); i++) split_glue(glues[i], bps, glues2, 0);
 	glues.clear();
-	for (int i = 0; i < glues2.size(); i++) {
-		check_glue(glues2[i]);
-	}
 	for (int i = 0; i < glues2.size(); i++) split_glue(glues2[i], bps, glues, 1);
-	//for (int i = 0; i < glues.size(); i++) cout << glues[i] << endl;
 
 	//perform transitive closure of glues
 	//at this point, any two intervals are either disjoint or identical
@@ -198,25 +196,45 @@ int main(int argc, char ** argv) {
 	for (int i = 0; i < glues.size(); i++) {
 		intervals.push_back(make_pair(glues[i].intv[0], curidx++));
 		intervals.push_back(make_pair(glues[i].intv[1], curidx++));
-		//link glued intervals
-		uf.unionn(curidx - 1, curidx - 2, glues[i].inv);
+		uf.unionn(curidx - 1, curidx - 2, glues[i].inv); //link glued intervals
 	}
 
-	//sort intervals so that we can join identical intervals
+	//sort intervals and then join identical intervals
 	sort(intervals.begin(), intervals.end());
 	for (int i = 1; i < intervals.size(); i++) {
 		if (intervals[i].first == intervals[i-1].first) {
-			//link identical intervals
-			uf.unionn(intervals[i].second, intervals[i-1].second, false);
+			uf.unionn(intervals[i].second, intervals[i-1].second, false); //link identical intervals
 		}
 	}
 
+	//create intervals to fill the gaps along the chromosome where no glues present
+	vector<Interval> gaps;
+	int lastEnd = 0;
+	Interval gap;
+	gap.chr = chr;
+	for (int i = 0; i < intervals.size(); i++) {
+		Interval intv = intervals[i].first;
+		gap.start = lastEnd + 1;
+		gap.end   = intv.start - 1;
+		if (gap.end >= gap.start) {
+			gaps.push_back(gap);
+		}
+		lastEnd = intv.end;
+	}
+	if (lastEnd < chrLen) { //add last gap
+		gap.start = lastEnd + 1;
+		gap.end   = chrLen;
+		gaps.push_back(gap);
+	}
+
 	//output
-	vector<Interval> idx2interval(intervals.size());
+	// the format is "interval invert? block_index block_size"
+	vector<Interval> idx2interval(intervals.size()); 
 	for (int i = 0; i < intervals.size(); i++) idx2interval.at(intervals[i].second) = intervals[i].first;
 
 	vector<vector<pair<int, bool> > > classes;
 	uf.get_classes(classes);
+	int curBlock = 0;
 	for (int i = 0; i < classes.size(); i++) {
 		vector<Interval> outlines;
 		for (int j = 0; j < classes[i].size(); j++) {
@@ -228,9 +246,14 @@ int main(int argc, char ** argv) {
 		}
 		sort(outlines.begin(), outlines.end());
 		outlines.erase(unique(outlines.begin(), outlines.end()), outlines.end());
-		for (int i = 0; i < outlines.size(); i++) outf << outlines[i] << endl;
-		outf << endl;
+		for (int i = 0; i < outlines.size(); i++) outf << outlines[i] << "\t" << curBlock << "\t" << outlines.size() << endl;
+		curBlock++;
 	}
+
+	for (int i = 0; i < gaps.size(); i++) {
+		outf << gaps[i] << "\t" << "0" << "\t" << curBlock++ << "\t" << "1" << endl;
+	}
+
 	outf.close();
 
 	return 0;
