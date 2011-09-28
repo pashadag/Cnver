@@ -9,7 +9,7 @@ fi
 #want to keep going untill its not diff
 filename=$3.supsmoo
 count=0
-cat $3 | grep -v "#" | awk '{print $1,$2,$3,int($5)}' | sort -k 2n > ${filename}0
+cat $3 | grep -v "#" | awk '{print $1,$2,$3,int($4)}' | sort -k 2n > ${filename}0
 d=1
 while [ $d -ne 0 ]
 do

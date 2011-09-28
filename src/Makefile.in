@@ -34,9 +34,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = interval_join$(EXEEXT) glue2graph$(EXEEXT) \
+bin_PROGRAMS = interval_join$(EXEEXT) map_coord$(EXEEXT) \
+	merge_links$(EXEEXT) block2graph$(EXEEXT) add_links$(EXEEXT) \
+	add_breaks$(EXEEXT) glue2block$(EXEEXT) \
 	fill_reference_graph$(EXEEXT) make_gc_map$(EXEEXT) \
-	report_cnvs$(EXEEXT) maps2bin$(EXEEXT) find_spikes$(EXEEXT) \
+	report_cnvs_old$(EXEEXT) report_cnvs$(EXEEXT) \
+	maps2bin$(EXEEXT) find_spikes$(EXEEXT) \
 	make_reference_graph$(EXEEXT) make_donor_graph$(EXEEXT) \
 	make_simple_coverage$(EXEEXT) interleave_bam$(EXEEXT) \
 	readbin$(EXEEXT) make_ns$(EXEEXT) find_mean_sd$(EXEEXT) \
@@ -53,6 +56,15 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
+am_add_breaks_OBJECTS = add_breaks.$(OBJEXT)
+add_breaks_OBJECTS = $(am_add_breaks_OBJECTS)
+add_breaks_LDADD = $(LDADD)
+am_add_links_OBJECTS = add_links.$(OBJEXT)
+add_links_OBJECTS = $(am_add_links_OBJECTS)
+add_links_LDADD = $(LDADD)
+am_block2graph_OBJECTS = block2graph.$(OBJEXT)
+block2graph_OBJECTS = $(am_block2graph_OBJECTS)
+block2graph_LDADD = $(LDADD)
 am_fill_reference_graph_OBJECTS = fill_reference_graph.$(OBJEXT)
 fill_reference_graph_OBJECTS = $(am_fill_reference_graph_OBJECTS)
 fill_reference_graph_LDADD = $(LDADD)
@@ -66,9 +78,9 @@ find_mean_sd_LDADD = $(LDADD)
 am_find_spikes_OBJECTS = find_spikes.$(OBJEXT)
 find_spikes_OBJECTS = $(am_find_spikes_OBJECTS)
 find_spikes_LDADD = $(LDADD)
-am_glue2graph_OBJECTS = glue2graph.$(OBJEXT)
-glue2graph_OBJECTS = $(am_glue2graph_OBJECTS)
-glue2graph_LDADD = $(LDADD)
+am_glue2block_OBJECTS = glue2block.$(OBJEXT)
+glue2block_OBJECTS = $(am_glue2block_OBJECTS)
+glue2block_LDADD = $(LDADD)
 am_intRemove2_OBJECTS = intRemove2.$(OBJEXT)
 intRemove2_OBJECTS = $(am_intRemove2_OBJECTS)
 intRemove2_LDADD = $(LDADD)
@@ -94,16 +106,25 @@ make_reference_graph_LDADD = $(LDADD)
 am_make_simple_coverage_OBJECTS = make_simple_coverage.$(OBJEXT)
 make_simple_coverage_OBJECTS = $(am_make_simple_coverage_OBJECTS)
 make_simple_coverage_LDADD = $(LDADD)
+am_map_coord_OBJECTS = map_coord.$(OBJEXT)
+map_coord_OBJECTS = $(am_map_coord_OBJECTS)
+map_coord_LDADD = $(LDADD)
 am_maps2bin_OBJECTS = maps2bin.$(OBJEXT) BGZF.$(OBJEXT) \
 	BamReader.$(OBJEXT) BamWriter.$(OBJEXT)
 maps2bin_OBJECTS = $(am_maps2bin_OBJECTS)
 maps2bin_LDADD = $(LDADD)
+am_merge_links_OBJECTS = merge_links.$(OBJEXT)
+merge_links_OBJECTS = $(am_merge_links_OBJECTS)
+merge_links_LDADD = $(LDADD)
 am_readbin_OBJECTS = readbin.$(OBJEXT)
 readbin_OBJECTS = $(am_readbin_OBJECTS)
 readbin_LDADD = $(LDADD)
 am_report_cnvs_OBJECTS = report_cnvs.$(OBJEXT)
 report_cnvs_OBJECTS = $(am_report_cnvs_OBJECTS)
 report_cnvs_LDADD = $(LDADD)
+am_report_cnvs_old_OBJECTS = report_cnvs_old.$(OBJEXT)
+report_cnvs_old_OBJECTS = $(am_report_cnvs_old_OBJECTS)
+report_cnvs_old_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -116,22 +137,28 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(fill_reference_graph_SOURCES) $(filter_axt_SOURCES) \
-	$(find_mean_sd_SOURCES) $(find_spikes_SOURCES) \
-	$(glue2graph_SOURCES) $(intRemove2_SOURCES) \
-	$(interleave_bam_SOURCES) $(interval_join_SOURCES) \
-	$(make_donor_graph_SOURCES) $(make_gc_map_SOURCES) \
-	$(make_ns_SOURCES) $(make_reference_graph_SOURCES) \
-	$(make_simple_coverage_SOURCES) $(maps2bin_SOURCES) \
-	$(readbin_SOURCES) $(report_cnvs_SOURCES)
-DIST_SOURCES = $(fill_reference_graph_SOURCES) $(filter_axt_SOURCES) \
-	$(find_mean_sd_SOURCES) $(find_spikes_SOURCES) \
-	$(glue2graph_SOURCES) $(intRemove2_SOURCES) \
-	$(interleave_bam_SOURCES) $(interval_join_SOURCES) \
-	$(make_donor_graph_SOURCES) $(make_gc_map_SOURCES) \
-	$(make_ns_SOURCES) $(make_reference_graph_SOURCES) \
-	$(make_simple_coverage_SOURCES) $(maps2bin_SOURCES) \
-	$(readbin_SOURCES) $(report_cnvs_SOURCES)
+SOURCES = $(add_breaks_SOURCES) $(add_links_SOURCES) \
+	$(block2graph_SOURCES) $(fill_reference_graph_SOURCES) \
+	$(filter_axt_SOURCES) $(find_mean_sd_SOURCES) \
+	$(find_spikes_SOURCES) $(glue2block_SOURCES) \
+	$(intRemove2_SOURCES) $(interleave_bam_SOURCES) \
+	$(interval_join_SOURCES) $(make_donor_graph_SOURCES) \
+	$(make_gc_map_SOURCES) $(make_ns_SOURCES) \
+	$(make_reference_graph_SOURCES) \
+	$(make_simple_coverage_SOURCES) $(map_coord_SOURCES) \
+	$(maps2bin_SOURCES) $(merge_links_SOURCES) $(readbin_SOURCES) \
+	$(report_cnvs_SOURCES) $(report_cnvs_old_SOURCES)
+DIST_SOURCES = $(add_breaks_SOURCES) $(add_links_SOURCES) \
+	$(block2graph_SOURCES) $(fill_reference_graph_SOURCES) \
+	$(filter_axt_SOURCES) $(find_mean_sd_SOURCES) \
+	$(find_spikes_SOURCES) $(glue2block_SOURCES) \
+	$(intRemove2_SOURCES) $(interleave_bam_SOURCES) \
+	$(interval_join_SOURCES) $(make_donor_graph_SOURCES) \
+	$(make_gc_map_SOURCES) $(make_ns_SOURCES) \
+	$(make_reference_graph_SOURCES) \
+	$(make_simple_coverage_SOURCES) $(map_coord_SOURCES) \
+	$(maps2bin_SOURCES) $(merge_links_SOURCES) $(readbin_SOURCES) \
+	$(report_cnvs_SOURCES) $(report_cnvs_old_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -225,18 +252,24 @@ maps2bin_SOURCES = maps2bin.cpp bamtools/BamAux.h bamtools/zlib.h bamtools/zconf
 #maps2bin_LDADD=-lz
 interleave_bam_SOURCES = interleave_bam.cpp bamtools/BamAux.h bamtools/zlib.h bamtools/zconf.h bamtools/BGZF.cpp bamtools/BamReader.cpp bamtools/BamWriter.cpp 
 #interleave_bam_LDADD=-lz
-glue2graph_SOURCES = glue2graph.cpp include/graphtypes.h include/defs.h include/union.h
+glue2block_SOURCES = glue2block.cpp include/graphtypes.h include/defs.h include/union.h include/block.h
+add_breaks_SOURCES = add_breaks.cpp include/interval.h include/defs.h include/block.h
+block2graph_SOURCES = block2graph.cpp include/interval.h include/defs.h include/block.h
+add_links_SOURCES = add_links.cpp include/interval.h include/defs.h include/block.h
+merge_links_SOURCES = merge_links.cpp include/defs.h 
+map_coord_SOURCES = map_coord.cpp include/defs.h 
 filter_axt_SOURCES = filter_axt.cpp include/defs.h include/dbtypes.h
 fill_reference_graph_SOURCES = fill_reference_graph.c include/graphtypes.h
 make_gc_map_SOURCES = make_gc_map.cpp include/dbtypes.h include/defs.h
-report_cnvs_SOURCES = report_cnvs.cpp include/dbtypes.h include/graphtypes.h
+report_cnvs_SOURCES = report_cnvs.cpp include/block.h include/interval.h
+report_cnvs_old_SOURCES = report_cnvs_old.cpp include/dbtypes.h include/graphtypes.h
 find_spikes_SOURCES = find_spikes.c 
 make_reference_graph_SOURCES = make_reference_graph.c include/graphtypes.h
 make_donor_graph_SOURCES = make_donor_graph.cpp include/graphtypes.h include/dbtypes.h 
 make_simple_coverage_SOURCES = make_simple_coverage.cpp include/dbtypes.h
 interval_join_SOURCES = interval_join.cpp 
-SUBDIRS = cluster post_analysis cs2-4.6 high-copy-count-regions 
-EXTRA_DIST = flow_solve bamtools cnver.pl smoother.sh merge_intervals.py
+SUBDIRS = cluster post_analysis cs2-4.6 high-copy-count-regions flow_solve
+EXTRA_DIST = bamtools cnver.pl smoother.sh merge_intervals.py
 all: all-recursive
 
 .SUFFIXES:
@@ -293,6 +326,15 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+add_breaks$(EXEEXT): $(add_breaks_OBJECTS) $(add_breaks_DEPENDENCIES) 
+	@rm -f add_breaks$(EXEEXT)
+	$(CXXLINK) $(add_breaks_LDFLAGS) $(add_breaks_OBJECTS) $(add_breaks_LDADD) $(LIBS)
+add_links$(EXEEXT): $(add_links_OBJECTS) $(add_links_DEPENDENCIES) 
+	@rm -f add_links$(EXEEXT)
+	$(CXXLINK) $(add_links_LDFLAGS) $(add_links_OBJECTS) $(add_links_LDADD) $(LIBS)
+block2graph$(EXEEXT): $(block2graph_OBJECTS) $(block2graph_DEPENDENCIES) 
+	@rm -f block2graph$(EXEEXT)
+	$(CXXLINK) $(block2graph_LDFLAGS) $(block2graph_OBJECTS) $(block2graph_LDADD) $(LIBS)
 fill_reference_graph$(EXEEXT): $(fill_reference_graph_OBJECTS) $(fill_reference_graph_DEPENDENCIES) 
 	@rm -f fill_reference_graph$(EXEEXT)
 	$(LINK) $(fill_reference_graph_LDFLAGS) $(fill_reference_graph_OBJECTS) $(fill_reference_graph_LDADD) $(LIBS)
@@ -305,9 +347,9 @@ find_mean_sd$(EXEEXT): $(find_mean_sd_OBJECTS) $(find_mean_sd_DEPENDENCIES)
 find_spikes$(EXEEXT): $(find_spikes_OBJECTS) $(find_spikes_DEPENDENCIES) 
 	@rm -f find_spikes$(EXEEXT)
 	$(LINK) $(find_spikes_LDFLAGS) $(find_spikes_OBJECTS) $(find_spikes_LDADD) $(LIBS)
-glue2graph$(EXEEXT): $(glue2graph_OBJECTS) $(glue2graph_DEPENDENCIES) 
-	@rm -f glue2graph$(EXEEXT)
-	$(CXXLINK) $(glue2graph_LDFLAGS) $(glue2graph_OBJECTS) $(glue2graph_LDADD) $(LIBS)
+glue2block$(EXEEXT): $(glue2block_OBJECTS) $(glue2block_DEPENDENCIES) 
+	@rm -f glue2block$(EXEEXT)
+	$(CXXLINK) $(glue2block_LDFLAGS) $(glue2block_OBJECTS) $(glue2block_LDADD) $(LIBS)
 intRemove2$(EXEEXT): $(intRemove2_OBJECTS) $(intRemove2_DEPENDENCIES) 
 	@rm -f intRemove2$(EXEEXT)
 	$(CXXLINK) $(intRemove2_LDFLAGS) $(intRemove2_OBJECTS) $(intRemove2_LDADD) $(LIBS)
@@ -332,15 +374,24 @@ make_reference_graph$(EXEEXT): $(make_reference_graph_OBJECTS) $(make_reference_
 make_simple_coverage$(EXEEXT): $(make_simple_coverage_OBJECTS) $(make_simple_coverage_DEPENDENCIES) 
 	@rm -f make_simple_coverage$(EXEEXT)
 	$(CXXLINK) $(make_simple_coverage_LDFLAGS) $(make_simple_coverage_OBJECTS) $(make_simple_coverage_LDADD) $(LIBS)
+map_coord$(EXEEXT): $(map_coord_OBJECTS) $(map_coord_DEPENDENCIES) 
+	@rm -f map_coord$(EXEEXT)
+	$(CXXLINK) $(map_coord_LDFLAGS) $(map_coord_OBJECTS) $(map_coord_LDADD) $(LIBS)
 maps2bin$(EXEEXT): $(maps2bin_OBJECTS) $(maps2bin_DEPENDENCIES) 
 	@rm -f maps2bin$(EXEEXT)
 	$(CXXLINK) $(maps2bin_LDFLAGS) $(maps2bin_OBJECTS) $(maps2bin_LDADD) $(LIBS)
+merge_links$(EXEEXT): $(merge_links_OBJECTS) $(merge_links_DEPENDENCIES) 
+	@rm -f merge_links$(EXEEXT)
+	$(CXXLINK) $(merge_links_LDFLAGS) $(merge_links_OBJECTS) $(merge_links_LDADD) $(LIBS)
 readbin$(EXEEXT): $(readbin_OBJECTS) $(readbin_DEPENDENCIES) 
 	@rm -f readbin$(EXEEXT)
 	$(CXXLINK) $(readbin_LDFLAGS) $(readbin_OBJECTS) $(readbin_LDADD) $(LIBS)
 report_cnvs$(EXEEXT): $(report_cnvs_OBJECTS) $(report_cnvs_DEPENDENCIES) 
 	@rm -f report_cnvs$(EXEEXT)
 	$(CXXLINK) $(report_cnvs_LDFLAGS) $(report_cnvs_OBJECTS) $(report_cnvs_LDADD) $(LIBS)
+report_cnvs_old$(EXEEXT): $(report_cnvs_old_OBJECTS) $(report_cnvs_old_DEPENDENCIES) 
+	@rm -f report_cnvs_old$(EXEEXT)
+	$(CXXLINK) $(report_cnvs_old_LDFLAGS) $(report_cnvs_old_OBJECTS) $(report_cnvs_old_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -351,11 +402,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BGZF.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BamReader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BamWriter.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/add_breaks.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/add_links.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/block2graph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fill_reference_graph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filter_axt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/find_mean_sd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/find_spikes.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glue2graph.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glue2block.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/intRemove2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interleave_bam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval_join.Po@am__quote@
@@ -364,9 +418,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/make_ns.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/make_reference_graph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/make_simple_coverage.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map_coord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maps2bin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/merge_links.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readbin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/report_cnvs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/report_cnvs_old.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

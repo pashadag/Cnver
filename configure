@@ -1714,7 +1714,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 
-CFLAGS='-std=c99'
+CFLAGS='-std=c99 -g'
 CXXFLAGS='-O0 -g'
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3365,7 +3365,7 @@ echo "$as_me: error: zlib not found, see http://www.zlib.net" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-                                                            ac_config_files="$ac_config_files Makefile src/Makefile src/cluster/Makefile src/high-copy-count-regions/Makefile src/post_analysis/Makefile src/cs2-4.6/Makefile"
+                                                                      ac_config_files="$ac_config_files Makefile src/Makefile src/cluster/Makefile src/high-copy-count-regions/Makefile src/post_analysis/Makefile src/cs2-4.6/Makefile src/flow_solve/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3929,6 +3929,7 @@ do
   "src/high-copy-count-regions/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/high-copy-count-regions/Makefile" ;;
   "src/post_analysis/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/post_analysis/Makefile" ;;
   "src/cs2-4.6/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/cs2-4.6/Makefile" ;;
+  "src/flow_solve/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/flow_solve/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

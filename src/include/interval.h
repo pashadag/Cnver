@@ -29,10 +29,11 @@ public:
 
 	Link() {}
 	Link(string _chr, int _from, int _to, int _type, string _label = "") : chr(_chr), from(_from), to(_to), type(_type), label(_label)  {}
+
 };
 
 ostream & operator << (ostream & out, const Link & i) {
-	out << i.chr << "\t" << i.from << "\t" << i.to;
+	out << i.chr << "\t" << i.from << "\t" << i.to << "\t" << i.type;
 	if (i.label != "") out << "\t" << i.label;
 	return out;
 }
@@ -42,6 +43,8 @@ Link read_link(string sbuf) {
 	Link i;
 	line >> i.chr >> i.from >> i.to >> i.type;
 	getline(line, i.label); //the rest of the line is a label
+	int pos = i.label.find_first_not_of(" \t"); //trim leading whitespace
+	i.label = i.label.substr(pos);
 	return i;
 }
 
@@ -143,6 +146,9 @@ Interval read_interval(string sbuf) {
 	Interval i;
 	line >> i.chr >> i.start >> i.end;
 	getline(line, i.label); //the rest of the line is a label
+	//trim leading whitespace in label
+	int pos = i.label.find_first_not_of(" \t");
+	i.label = i.label.substr(pos);
 	return i;
 }
 
@@ -156,6 +162,26 @@ int read_intervals(istream & in, T & intervals) {
 		num_read++;
 	}
 	return num_read;
+}
+
+
+//range is a closed interval
+//points should be sorted
+//this ignores the chromosome for now
+void searchRange(vector<int> & points, Interval range, int & start, int & end) {
+	vector<int>::iterator it = lower_bound(points.begin(), points.end(), range.start);
+	if (it == points.end() || *it > range.end) {
+		start = 0;
+		end = 0;
+		return;
+	}
+	start = it - points.begin();
+	end = start + 1;
+	it++;
+	while (it != points.end() && *it <= range.end) {
+		it++;
+		end++;
+	}
 }
 
 #endif

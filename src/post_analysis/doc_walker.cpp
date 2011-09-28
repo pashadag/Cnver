@@ -8,7 +8,7 @@
 string sbuf;
 FILE *f;
 FILE *g;
-bool concise = false;
+string outputFormat = "full";
 
 bool process_interval(Interval i) {
 	long range = i.end - i.start + 1;
@@ -66,11 +66,18 @@ bool process_interval(Interval i) {
 	}
 	double doc_ratio = (double) sum_masked / (double) sum_expected;
 	cout << i << "\t";
-	if (concise) {
+	if (outputFormat == "concise") {
 		printf ("%.4f\n", doc_ratio);
-	} else{
+	} else if (outputFormat == "full") {
 		printf ("DOC_ratio:\t%.4f\tObserved_coverage:\t%.4f\tExpected_coverage:\t%.4f\tNum_masked_positions:\t%d\tObserved_coverage_including_masked_regions:\t%.4f\n", doc_ratio, sum_masked, sum_expected, masked, sum_unmasked);
+	} else if (outputFormat == "internal") {
+		printf("%.4f\t%.4f\t%d\n", sum_masked, sum_expected, range - masked);
+	} else {
+		cerr << "Unknown output format: " << outputFormat << endl;
+		exit(1);
 	}
+
+
 	delete fs;
 	delete gs;
 	return true;
@@ -86,13 +93,11 @@ int main(int argc, char** argv) {
 	} else if (argc == 6) {
 		start = atoi(argv[3]);
 		end   = atoi(argv[4]);
-		concise = true;
-		cerr << "Using option " << argv[5] << endl;
+		outputFormat = argv[5];
 	} else if (argc == 4) {
-		concise = true;
-		cerr << "Using option " << argv[3] << endl;
+		outputFormat = argv[3];
 	} else if (argc != 3) {
-		printf("%s scov_file gc_file [start end] [concise] \n", argv[0]);
+		printf("%s scov_file gc_file [start end] [concise|internal] \n", argv[0]);
 		printf("The .scov and .gc files can be found in the work_dir.\n");
 		printf("If start/end is not specified, an interval file is taken as an input.\n");
 		exit(1);

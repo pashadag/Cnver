@@ -94,7 +94,7 @@ AUTOMAKE = ${SHELL} /home/pmedvedev/Cnver/missing --run automake-1.9
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -std=c99
+CFLAGS = -std=c99 -g
 CPPFLAGS = 
 CXX = g++
 CXXDEPMODE = depmode=gcc3

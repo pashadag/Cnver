@@ -72,7 +72,7 @@ AUTOMAKE = ${SHELL} /home/pmedvedev/Cnver/missing --run automake-1.9
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -std=c99
+CFLAGS = -std=c99 -g
 CPPFLAGS = 
 CXX = g++
 CXXDEPMODE = depmode=gcc3
@@ -139,7 +139,8 @@ sysconfdir = ${prefix}/etc
 target_alias = 
 cs2_SOURCES = cs2.c types_cs2.h timer.c
 cs2_LDADD = -lm
-cs2_CPPFLAGS = -DPRINT_ANS -DNDEBUG
+cs2_CPPFLAGS = -DPRINT_ANS
+#cs2_CPPFLAGS=-DPRINT_ANS -DNDEBUG
 EXTRA_DIST = parser_cs2.c wintimer.c
 all: all-am
 

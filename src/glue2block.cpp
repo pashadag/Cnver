@@ -9,6 +9,7 @@
 #include "include/defs.h"
 #include "include/interval.h"
 #include "include/union.h"
+#include "include/block.h"
 
 /* Glue class and operators */
 class Glue {
@@ -61,58 +62,6 @@ bool operator== (const Interval & i1, const Interval & i2) {
 	return (i1.chr == i2.chr && i1.start == i2.start && i1.end == i2.end && i1.label == i2.label);
 }
 
-//range is a closed interval
-//points should be sorted
-void searchRange(vector<int> & points, Interval range, int & start, int & end) {
-	vector<int>::iterator it = lower_bound(points.begin(), points.end(), range.start);
-	if (it == points.end() || *it > range.end) {
-		start = 0;
-		end = 0;
-		return;
-	}
-	start = it - points.begin();
-	end = start + 1;
-	it++;
-	while (it != points.end() && *it <= range.end) {
-		it++;
-		end++;
-	}
-}
-
-//for debugging only
-void check_glue(Glue g) {
-	for (int i = 0; i < 2; i++) {
-		if (g.intv[i].start > g.intv[i].end) {
-			cerr << "Invalid glue: " << g << endl;
-		} 
-	}
-	return;
-}
-
-void split_glue(Glue g, vector<int> & bps, vector<Glue> & result, int main_idx = 0) {
-	Glue origGlue = g;
-	int sec_idx = abs(main_idx -1 );
-	
-	int bp_start, bp_end;
-	Interval range = g.intv[main_idx];
-	searchRange(bps, range, bp_start, bp_end);
-	for (int i = bp_start; i < bp_end; i++) {
-		int bp = bps[i];
-		//assume alignments have no gaps
-		//break off the beginning
-		if (bp == g.intv[main_idx].start) continue;
-		Glue newglue = g;
-		g.intv[sec_idx].start += bp - g.intv[main_idx].start;
-		g.intv[main_idx].start = bp;
-		newglue.intv[main_idx].end = g.intv[main_idx].start - 1;
-		newglue.intv[sec_idx].end = g.intv[sec_idx].start - 1;
-		result.push_back(newglue);
-	}
-	result.push_back(g);
-}
-
-
-
 /* Takes, as input, a glue file. Produces, as output,
    repeat graph entries (to be sorted later) */
 int main(int argc, char ** argv) {
@@ -138,37 +87,39 @@ int main(int argc, char ** argv) {
 		return -1;
 	}
 
-	vector<Glue> glues;
-	vector<int> bps;
+	vector<Block> blocks;
 
 	// First, convert glues to edge file for downstream graph building
-	vector<string> row;
 	uint64_t cur_edge = 0;
-	Glue g;
-	while(inf >> g.intv[0].chr >> g.intv[0].start >> g.intv[0].end >> g.intv[1].chr >> g.intv[1].start >> g.intv[1].end >> g.inv) {
-		glues.push_back(g);
-		bps.push_back(g.intv[0].start); bps.push_back(g.intv[1].start);
-		bps.push_back(g.intv[0].end + 1); bps.push_back(g.intv[1].end + 1);
-
+	Interval intv[2];
+	bool inv;
+	while (inf >> intv[0].chr >> intv[0].start >> intv[0].end >> intv[1].chr >> intv[1].start >> intv[1].end >> inv) {
+		Block b;
+		b.intv.push_back(intv[0]);
+		b.intv.push_back(intv[1]);
+		b.inv.push_back(false);
+		b.inv.push_back(inv);
+		blocks.push_back(b);
+		
 		char strand;
-		if (g.inv) strand = '-'; else strand = '+';
+		if (inv) strand = '-'; else strand = '+';
 
-		assert(g.intv[0].chr == g.intv[1].chr); 
+		assert(b.intv[0].chr == b.intv[1].chr); 
 
 		/* Write nodes */
 		pos_entry_t entry = { 0 };
 
 		/* First node */
-		strcpy(entry.pos.contigname, g.intv[0].chr.c_str());
-		entry.pos.contigstart = g.intv[0].start;
-		entry.pos.contigend = g.intv[0].end;
+		strcpy(entry.pos.contigname, b.intv[0].chr.c_str());
+		entry.pos.contigstart = b.intv[0].start;
+		entry.pos.contigend = b.intv[0].end;
 		entry.pos.strand = '+';
 		entry.edgeindex = cur_edge;
 		fwrite(&(entry), sizeof(pos_entry_t), 1, output);
 
 		/* Second node */
-		entry.pos.contigstart = g.intv[1].start;
-		entry.pos.contigend = g.intv[1].end;
+		entry.pos.contigstart = b.intv[1].start;
+		entry.pos.contigend = b.intv[1].end;
 		entry.pos.strand = strand;
 		entry.edgeindex = cur_edge;
 		fwrite(&(entry), sizeof(pos_entry_t), 1, output);
@@ -182,21 +133,19 @@ int main(int argc, char ** argv) {
 	// Second, split glues into minimal chunks.
 	// Assume glues are given in terms of closed intervals.
 	// Assume that there are no gaps (this case would be difficult to handle properly and would require more information in the alignment)
-	vector<Glue> glues2;
-	sort(bps.begin(), bps.end());
-	for (int i = 0; i < glues.size(); i++) split_glue(glues[i], bps, glues2, 0);
-	glues.clear();
-	for (int i = 0; i < glues2.size(); i++) split_glue(glues2[i], bps, glues, 1);
+	vector<int> bps;
+	getBlockBps(blocks, bps);
+	split_blocks(blocks, bps);
 
-	//perform transitive closure of glues
+	//perform transitive closure of blocks 
 	//at this point, any two intervals are either disjoint or identical
-	UnionFindClass uf(2 * glues.size());
+	UnionFindClass uf(2 * blocks.size());
 	vector<pair<Interval, int> > intervals;
 	int curidx = 0;
-	for (int i = 0; i < glues.size(); i++) {
-		intervals.push_back(make_pair(glues[i].intv[0], curidx++));
-		intervals.push_back(make_pair(glues[i].intv[1], curidx++));
-		uf.unionn(curidx - 1, curidx - 2, glues[i].inv); //link glued intervals
+	for (int i = 0; i < blocks.size(); i++) {
+		intervals.push_back(make_pair(blocks[i].intv[0], curidx++));
+		intervals.push_back(make_pair(blocks[i].intv[1], curidx++));
+		uf.unionn(curidx - 1, curidx - 2, blocks[i].inv[1]); //link glued intervals
 	}
 
 	//sort intervals and then join identical intervals
@@ -207,7 +156,7 @@ int main(int argc, char ** argv) {
 		}
 	}
 
-	//create intervals to fill the gaps along the chromosome where no glues present
+	//create singleton blocks to fill the gaps along the chromosome where no glues present
 	vector<Interval> gaps;
 	int lastEnd = 0;
 	Interval gap;
@@ -228,7 +177,7 @@ int main(int argc, char ** argv) {
 	}
 
 	//output
-	// the format is "interval invert? block_index block_size"
+	// the format is "interval invert? block_size block_index "
 	vector<Interval> idx2interval(intervals.size()); 
 	for (int i = 0; i < intervals.size(); i++) idx2interval.at(intervals[i].second) = intervals[i].first;
 
@@ -246,12 +195,12 @@ int main(int argc, char ** argv) {
 		}
 		sort(outlines.begin(), outlines.end());
 		outlines.erase(unique(outlines.begin(), outlines.end()), outlines.end());
-		for (int i = 0; i < outlines.size(); i++) outf << outlines[i] << "\t" << curBlock << "\t" << outlines.size() << endl;
+		for (int i = 0; i < outlines.size(); i++) outf << outlines[i] << "\t" << outlines.size() << "\t" << curBlock << endl;
 		curBlock++;
 	}
 
 	for (int i = 0; i < gaps.size(); i++) {
-		outf << gaps[i] << "\t" << "0" << "\t" << curBlock++ << "\t" << "1" << endl;
+		outf << gaps[i] << "\t0\t1\t" << curBlock++ << "\t" << endl;
 	}
 
 	outf.close();

@@ -1,0 +1,58 @@
+README file for the biflow_solve package
+
+******************************************
+*********** biflow_solve *****************
+******************************************
+
+To run, type "biflow_solve -i problemFile -o outputFile".
+problemFile defines the flow problem (described below), while output file is the problem file annotated with the solution (also described below).
+
+******************************************
+**** format for problemFile **************
+******************************************
+
+"c ..." is comment line
+
+"p min #nodes #arcs" is problem definition line
+
+"n id balance [low cap cost]" is node description line.  
+the id is an int between 1 and #nodes
+all nodes (1..n) must have an "n" line, and all "n" lines must come before the "a" lines
+Non-zero balance means the node is either a source or a sink.  
+The low,cap,cost parameters are optional (but if one is included then all must be), and they represent constraints on the node.
+
+"a src dst low cap cost" is the arc description line.
+one line per arc
+cost is an integer (non-negative??? not sure...)
+The arcs can go from negative vertices to encode bidirectionality
+x y   is an edge going out of x and into y
+x -y  is going out of x and out of y
+-x y  is going into x and into y
+-x -y is going into x and out of y
+The reason for this type of encoding is that it is compatible with directed graphs.
+
+******************************************
+**** Output format *******************
+******************************************
+
+The output is exactly the input with:
+
+1. Each node line that has costs now has a last column that says the amount of flow going through that node
+2. Each arc line has a last columnt that says the amount of flow going through that arc.  The case of parallel arcs hasn't been tested yet.  For now, the behavior is that each of arc will be annotated with the sum flow along all the parallel arcs (but this is not tested, and probably not the desired behaviour either.  The reason for this pecularity is that cs2 does not return the flow along arcs but the flow between vertices).
+
+
+Description of files:
+	biflow_solve_novertawk : To run, type "biflow_solve_novert.awk problemFile".  
+	The problemFile is the same as above except that there cannot be any costs or bounds on the nodes
+
+******************************************
+**** How the program works ***************
+******************************************
+	The biflow_solve program splits each vertex which has a cost on it, calls biflow_solve_novert.awk to solve the resulting program, then transfers that flow
+	to the original problem.
+
+	The biflow_solve_novert.awk program monotonized the bigraph into a directed graph, calls cs2 on it, and transfers the flow to the original problem.
+
+	Please note that the program has not been fully tested, only on a few examples.
+
+

@@ -4,11 +4,13 @@
 #include <stdint.h>
 #include <errno.h>
 #include <ctype.h>
-#include <functional>
 #include "include/defs.h"
 #include "include/interval.h"
 #include "include/block.h"
 
+
+#define MAX_ADJ_ARC_CAPACITY 8888
+#define EPSILON_FLOW_COST 1
 
 int block2node(int blockIndex, int end) { 
 	if (end == 0) 
@@ -16,20 +18,6 @@ int block2node(int blockIndex, int end) {
 	else 
 		return blockIndex * 2 + 2;
 }
-
-
-
-//an interval along with a pointer into its location in the blocks
-class IntervalFromBlock {
-public:
-	Interval intv;
-	int blockIdx;
-	int intIdx;
-	IntervalFromBlock(Interval _intv, int _blockIdx, int _intIdx) : intv(_intv), blockIdx(_blockIdx), intIdx(_intIdx) {}
-	bool operator< (const IntervalFromBlock & other) const {
-		return intv < other.intv;
-	}
-};
 
 
 vector<Block> blocks;
@@ -56,8 +44,8 @@ void find_pos(int pos, int & block, int & end) {
 
 int main(int argc, char ** argv) {
 
-	if (argc != 4) {
-		fprintf(stderr, "usage: %s <block_file> <link_file> <problem_file>\n", argv[0]);
+	if (argc != 5) {
+		fprintf(stderr, "usage: %s <block_file> <link_file> <problem_file> <base_flow>\n", argv[0]);
 		return -1;
 	}
 
@@ -72,23 +60,24 @@ int main(int argc, char ** argv) {
 	open_file(inf, argv[2]);
 	read_links(inf, links);
 	inf.close();
+	ofstream placedLinksOut;
+	open_file(placedLinksOut, make_string(argv[2]) + ".placed");
 
+	int baseFlow = atoi(argv[4]);
 
 	//output nodes
 	ofstream outf;
 	open_file(outf, argv[3]);
-	int numNodes = 2 * blocks.size();
-	outf << numNodes << endl;
 	for (int i = 0; i < blocks.size(); i++) {
-		outf << "NODE\t" << block2node(i,0) << "\t0" << endl;
-		outf << "NODE\t" << block2node(i,1) << "\t0" << endl;
+		outf << "n " << block2node(i,0) << " 0" << endl;
+		outf << "n " << block2node(i,1) << " 0" << endl;
 	}
 
 
 	//output sequence edges
 	for (int i = 0; i < blocks.size(); i++) {
 		Block b = blocks[i];
-		int totLen = 0;
+		double totLen = 0;
 		double totExp = 0;
 		double totCov = 0;
 		for (int j = 0; j < b.intv.size(); j++) {
@@ -100,25 +89,31 @@ int main(int argc, char ** argv) {
 			totExp += curExp;
 			totCov += curCov;
 		}
-		outf << "ARC\t" << block2node(i,0) << "\t" << block2node(i,1) << "\t" << totCov << "\t" << totLen << "\t" << totExp << endl; //not sure about the last one
+		double avgLen = totLen / b.intv.size();
+		double expDocPerPos;
+		if (totLen > 0) {
+			expDocPerPos = totExp / (baseFlow * totLen);
+		} else {
+			expDocPerPos = 0;
+		}
+		outf << "convex_arc " << block2node(i,0) << " " << block2node(i,1) << " ";
+		outf << totCov << " " << avgLen << " " << expDocPerPos << endl; 
 	}
 
 	//output reference adjacency edges
-	for (int i = 0; i < blocks.size(); i++) {
-		for (int j = 0; j < blocks[i].intv.size(); j++) {
-			intervals.push_back(IntervalFromBlock(blocks[i].intv[j], i, j));
-		}
-	}
-	sort(intervals.begin(), intervals.end());
+	getIntervalsFromBlocks(blocks, intervals);
 	for (int i = 0; i < intervals.size(); i++) {
 		int curBlock  = intervals[i].blockIdx;
 		int curInv    = blocks.at(curBlock).inv.at(intervals[i].intIdx) ? 1 : 0;
-		int nextBlock  = intervals[(i+1) % intervals.size()].blockIdx;
-		int nextInv    = blocks.at(nextBlock).inv.at(intervals[(i+1) % intervals.size()].intIdx) ? 1 : 0;
+		int nextBlock = intervals[(i+1) % intervals.size()].blockIdx;
+		int nextInv   = blocks.at(nextBlock).inv.at(intervals[(i+1) % intervals.size()].intIdx) ? 1 : 0;
+		int fromNode  = block2node(curBlock,  abs(curInv - 1)) * (curInv  * -2 + 1); 
+		int toNode    = block2node(nextBlock, abs(nextInv))    * (nextInv * -2 + 1);
+		outf << "a " << fromNode << " " << toNode << " ";
 		if (i == intervals.size() - 1) { //the last arc is cirulcation arc
-			outf << "ARC\t" << block2node(curBlock, abs(curInv - 1) ) << "\t" << block2node(nextBlock, nextInv) << "\t0\t-1\t0" << endl;
+			outf << baseFlow << " " << baseFlow << " " << EPSILON_FLOW_COST  << endl;
 		} else {
-			outf << "ARC\t" << block2node(curBlock, abs(curInv - 1) ) << "\t" << block2node(nextBlock, nextInv) << "\t0\t0\t0" << endl;
+			outf << "0 " << MAX_ADJ_ARC_CAPACITY << " " << EPSILON_FLOW_COST << endl;
 		}
 	}
 
@@ -129,10 +124,16 @@ int main(int argc, char ** argv) {
 		int block1, end1, block2, end2;
 		find_pos(link.from, block1, end1);
 		find_pos(link.to, block2, end2);
-		block1 *= end1 * 2 - 1;
-		block2 *= -1 * (end2 * 2 - 1);
-		outf << "ARC\t" << block1 << "\t" << block2 << "\t0\t0\t0" << endl;
+		int fromNode  = block2node(block1, end1);
+		int toNode    = block2node(block2, end2);
+		if (end1 == 0) fromNode *= -1;
+		if (end2 == 1) toNode   *= -1;
+		outf << "a " << fromNode << " " << toNode << " ";
+		outf << "0 " << MAX_ADJ_ARC_CAPACITY << " " << EPSILON_FLOW_COST << endl;
+		placedLinksOut << links[i] << "\t" << block1 << "\t" << block2 << "\t" << end1 << "\t" << end2 << endl;
 	}
 
+	outf.close();
+	placedLinksOut.close();
 	return 0;
 }

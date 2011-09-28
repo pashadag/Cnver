@@ -268,6 +268,7 @@ int argmax(T data[], int size) {
 	return maxPos;
 }
 
+//get n50 or n90 from a set of lenghts
 int nscore(vector<int> & data, int genLen, int nval) {
 	sort(data.begin(), data.end());
 	int totLen=0;
@@ -305,6 +306,23 @@ bool get_row_whitespace (istream & inFile, vector<string> & row ) {  //read a ta
 	}
 	return true;
 }
+
+void tokenize(string s, vector<string> & row) {
+	string sbuf;
+	istringstream lineStream(s);
+	row.clear();
+	while (lineStream >> sbuf) row.push_back(sbuf);
+}
+
+bool get_row_whitespace (istream & inFile, vector<string> & row, string & strLine ) {  //read a tab delimited line from file
+	string s;
+	row.clear();
+	getline(inFile, strLine);
+	if (inFile.eof()) return false;
+	tokenize(strLine, row);
+	return true;
+}
+
 
 char revcomp (char s) {
 	if (s == 'A') return 'T';

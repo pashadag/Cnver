@@ -45,7 +45,11 @@ int main(int argc, char * argv[]) {
 	if (argc == 2) gap = atoi(argv[1]); else gap = 0;
 	//cerr << "gap = " << gap << endl;
 	
-	if (!getline(cin, curLine)) {cerr << "empty file" << endl; exit(1);}
+	if (!getline(cin, curLine)) {
+		cerr << "empty file" << endl; 
+		return 0;
+	}
+
 	prevLine = curLine;
 	tokenize(prevLine, prevChr, prevLeft, prevRight);	
 

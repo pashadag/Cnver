@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <errno.h>
 #include <ctype.h>
-#include <functional>
 #include "include/defs.h"
 #include "include/interval.h"
 #include "include/block.h"
