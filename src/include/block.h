@@ -25,16 +25,17 @@ void getBlockBps(vector<Block> & blocks, vector<int> & bps) {
 }
 
 void split_block(int blockIdx, vector<int> & bps, vector<Block> & blocks, int main_idx) {
-	Block * b = &blocks[blockIdx];
-		if (main_idx >= b->intv.size()) {
-			return;
-		}
+	assert(blockIdx < blocks.size());
+	if (main_idx >= blocks[blockIdx].intv.size()) {
+		return;
+	}
 
 	int bp_start, bp_end;
-	Interval range = b->intv[main_idx];
+	Interval range = blocks[blockIdx].intv[main_idx];
 	searchRange(bps, range, bp_start, bp_end);
 	for (int i = bp_start; i < bp_end; i++) {
 		int bp = bps[i];
+		Block * b = &blocks[blockIdx];
 		//assume alignments have no gaps
 		//break off the beginning
 		if (bp == b->intv[main_idx].start) continue;
@@ -46,7 +47,7 @@ void split_block(int blockIdx, vector<int> & bps, vector<Block> & blocks, int ma
 		}
 		b->intv[main_idx].start = bp;
 		newblock.intv[main_idx].end = b->intv[main_idx].start - 1;
-		result.push_back(newblock);
+		blocks.push_back(newblock);
 	}
 }
 
@@ -58,7 +59,7 @@ void split_blocks(vector<Block> & blocks, vector<int> &bps) {
 	for (int i = 0; i < blocks.size(); i++) maxBlockSize = max(maxBlockSize, (int) blocks[i].intv.size());
 
 	for (int main_idx = 0; main_idx < maxBlockSize; main_idx++) {
-		int numBlocks = blocks.size()
+		int numBlocks = blocks.size();
 		for (int i = 0; i < numBlocks; i++) {
 			split_block(i, bps, blocks, main_idx);
 		}
