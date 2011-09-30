@@ -12,7 +12,8 @@ using namespace std;
 //#define CONTIGNAME_LEN  32
 //#define EDITSTRING_LEN  32
 #define MAX_BAM_READNAME 60
-#define CONTIGNAME_LEN_SMALL 10
+#define CONTIGNAME_LEN_SMALL 6
+//#define CONTIGNAME_LEN_SMALL 10
 
 typedef struct {
 	uint64_t 	read_id;

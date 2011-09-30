@@ -161,6 +161,8 @@ int main (int argc, char** argv) {
 	}
 
 	//calculate pos2lambda : expected arrivals per position
+	free(masks);
+	delete[] scov;
 	double* pos2lambda = (double*)malloc(sizeof(double)*(sequence.length()));
 	if (pos2lambda == NULL) {
 		fprintf(stderr,"Trouble allocating pos2lambda\n");
@@ -206,7 +208,7 @@ int main (int argc, char** argv) {
 	//printf("Repeats: %d, Un-Repeats: %d\n",repeats, not_repeats);
 	//printf("Shifted positions: %d\n",shifted_positions);
 
-	delete[] scov;
+	free(pos2lambda);
 	return 0;
 
 }

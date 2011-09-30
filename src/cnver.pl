@@ -214,6 +214,7 @@ while (<REF_NAMES>) {
 	#make the soft masks
 	execCommand ("cat $contig_breaks_folder/$ref.cbs $repeat_regions_folder/$ref.rep $work_fol/$ref.ns $work_fol/$ref.spikes | sort -k 2n | $CNVER_FOLDER/src/interval_join > $work_fol/$ref.softmasks");
 
+	MISC: 
 	#make GC map
 	execCommand ("$CNVER_FOLDER/src/make_gc_map $fasta_files_folder/$ref.fa $work_fol/$ref.softmasks $work_fol/$ref.scov $work_fol/$ref.gc $ref $gc_win_size 50");
 
@@ -243,7 +244,6 @@ while (<REF_NAMES>) {
 	my $screen_opts="--mean=$mean_insert --stdev=$stdev_insert --tolerance=$tolerance_around_contig_breaks --breaksFile = $contig_breaks_folder/$ref.cbs";
 	execCommand ("grep -h EDGE $work_fol/$ref.t[0123] | $CNVER_FOLDER/src/cluster/screen_contig_breaks $screen_opts | awk '{ if ((\$5 >= $min_mps) && (\$8 < $link_len_cutoff)) print \$0 }' > $work_fol/$ref.links");
 	
-MISC: 
 
 	#NOTE: Clusters are now switched to one based instead of zero-based as they were before....need to correct for this later.
 

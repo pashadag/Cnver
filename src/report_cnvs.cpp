@@ -14,9 +14,10 @@ vector<int> blockFlow;
 vector<int> tempFlow;
 vector<Block> blocks;
 vector<IntervalFromBlock> intervals;
+vector<int> walkCounts;
 
 int removeMaxFlow(int start, int len, int call) {
-	vector<int> walkCounts(blocks.size(), 0);
+	walkCounts.clear();
 	vector<int> walkBlocks;
 	for (int i = start; i < start + len; i++) {
 		int blockIdx = intervals[i].blockIdx;
@@ -64,7 +65,57 @@ int removeMaxFlow(int start, int len, int call) {
 }
 
 
+void decreaseUnitFlow(int start, int len, int change) {
+	for (int i = start; i < start + len; i++) {
+		int blockIdx = intervals[i].blockIdx;
+		blockFlow[blockIdx] -= change;
+	}
+}
 
+void findLongestPath(int & maxStart, int & maxBlockLen, int & maxBpLen, int & maxCall) {
+	maxBpLen = 0;
+	int start;
+	int bpLen = 0;
+	int lastCall = 0;
+	for (int i = 0; i < intervals.size(); i++) {
+		int blockIdx = intervals[i].blockIdx;
+		int curFlow = blockFlow.at(blockIdx);
+		int refCount = blocks[blockIdx].intv.size() * ploidy;
+		int curCall;
+		if (curFlow == refCount)     
+			curCall = 0;
+		else if (curFlow > refCount) 
+			curCall = 1;
+		else if (curFlow < refCount) 
+			curCall = -1;
+
+		if (curCall != lastCall && lastCall != 0) { //end path 
+			if (bpLen > maxBpLen) {
+				maxBpLen = bpLen;
+				maxBlockLen = i - start;
+				maxStart = start;
+				maxCall = lastCall;
+			}
+			//restore origin flow
+			decreaseUnitFlow(start, i - start, lastCall);
+
+		} 
+
+		if (curCall != 0) { //either start a new path or continue an old one
+			if (curCall != lastCall) { //start a new path
+				start = i;
+				bpLen = 0;
+			} 
+			blockFlow.at(blockIdx) -= curCall;
+			bpLen += intervals[i].intv.end - intervals[i].intv.start + 1;
+		}
+		lastCall = curCall;
+	}
+}
+
+
+
+/*
 void findLongestPath(int & maxStart, int & maxBlockLen, int & maxBpLen, int & maxCall) {
 	tempFlow = blockFlow;
 	maxBpLen = 0;
@@ -104,6 +155,7 @@ void findLongestPath(int & maxStart, int & maxBlockLen, int & maxBpLen, int & ma
 		lastCall = curCall;
 	}
 }
+*/
 
 int main(int argc, char ** argv) {
 
@@ -125,6 +177,7 @@ int main(int argc, char ** argv) {
 
 	//load flow of blocks from solution file
 	blockFlow.resize(blocks.size(), 0); 
+	walkCounts.resize(blocks.size(), 0); 
 	tempFlow.resize(blocks.size(), 0); 
 	open_file(inf, argv[2]);
 	vector<string> row;
