@@ -16,14 +16,21 @@ vector<Block> blocks;
 vector<IntervalFromBlock> intervals;
 vector<int> walkCounts;
 
+//removes as much flow along a walk as possible
+//assumes that at least one unit can be removed
 int removeMaxFlow(int start, int len, int call) {
-	walkCounts.clear();
 	vector<int> walkBlocks;
 	for (int i = start; i < start + len; i++) {
 		int blockIdx = intervals[i].blockIdx;
-		walkCounts[blockIdx]++;
 		walkBlocks.push_back(blockIdx);
 	}
+
+	//fill in the relevant fields of walkCounts...the point is that we don't just
+	//want to clear this array because it might be huge.
+	for (int i = 0; i < walkBlocks.size(); i++)  walkCounts[walkBlocks[i]] = 0;
+	for (int i = 0; i < walkBlocks.size(); i++)  walkCounts[walkBlocks[i]]++;
+	
+	//remove duplicates
 	sort(walkBlocks.begin(), walkBlocks.end());
 	walkBlocks.erase(unique(walkBlocks.begin(), walkBlocks.end()), walkBlocks.end());
 
@@ -72,6 +79,7 @@ void restoreUnitFlow(int start, int len, int change) {
 	}
 }
 
+//finds the longest walk, leaving the flow's unchanged
 void findLongestPath(int & maxStart, int & maxBlockLen, int & maxBpLen, int & maxCall) {
 	maxBpLen = 0;
 	int start;
@@ -157,6 +165,7 @@ int main(int argc, char ** argv) {
 		}
 	}
 
+	//find long walks and report them
 	int start, blockLen, bpLen, call;
 	findLongestPath(start, blockLen, bpLen, call);
 	while (bpLen >= minPathLen) {
