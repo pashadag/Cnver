@@ -11,52 +11,6 @@
 #include "include/union.h"
 #include "include/block.h"
 
-/* Glue class and operators */
-class Glue {
-	public:
-		Interval intv[2];
-		bool inv;
-};
-
-ostream & operator << (ostream & out, const Glue & g) {
-	out << g.intv[0] << "\t" << g.intv[1] << "\t" << g.inv;
-	return out;
-}
-
-
-bool comp_le1(const Glue & g1, const Glue &g2) {
-	return comp_le(g1.intv[0], g2.intv[0]);
-}
-
-bool comp_le2(const Glue & g1, const Glue &g2) {
-	return comp_le(g1.intv[1], g2.intv[1]);
-}
-
-
-ostream & operator << (ostream & out, const chr_pos_t & x) {
-	out << x.contigname << "\t" << x.contigstart << "\t" << x.contigend << "\t" << x.strand;
-	return out;
-}
-
-istream & operator >> (istream &in, chr_pos_t x) {
-	in >> x.contigname >> x.contigstart >> x.contigend >> x.strand;
-	return in;
-}
-
-ostream & operator << (ostream & out, const pos_entry_t& x) {
-	out << x.pos << "\t" << x.edgeindex;
-	return out;
-}
-
-istream & operator << (istream & in, pos_entry_t x) {
-	in >> x.pos >> x.edgeindex;
-	return in;
-}
-
-/* End Glue class definitions */
-
-
-
 
 bool operator== (const Interval & i1, const Interval & i2) {
 	return (i1.chr == i2.chr && i1.start == i2.start && i1.end == i2.end && i1.label == i2.label);
@@ -101,15 +55,16 @@ int main(int argc, char ** argv) {
 		b.inv.push_back(inv);
 		blocks.push_back(b);
 		
+		/*
 		char strand;
 		if (inv) strand = '-'; else strand = '+';
 
 		assert(b.intv[0].chr == b.intv[1].chr); 
 
-		/* Write nodes */
+		// Write nodes 
 		pos_entry_t entry = { 0 };
 
-		/* First node */
+		// First node 
 		strcpy(entry.pos.contigname, b.intv[0].chr.c_str());
 		entry.pos.contigstart = b.intv[0].start;
 		entry.pos.contigend = b.intv[0].end;
@@ -117,25 +72,37 @@ int main(int argc, char ** argv) {
 		entry.edgeindex = cur_edge;
 		fwrite(&(entry), sizeof(pos_entry_t), 1, output);
 
-		/* Second node */
+		// Second node 
 		entry.pos.contigstart = b.intv[1].start;
 		entry.pos.contigend = b.intv[1].end;
 		entry.pos.strand = strand;
 		entry.edgeindex = cur_edge;
 		fwrite(&(entry), sizeof(pos_entry_t), 1, output);
 		cur_edge++;
+		 */
 	}
 
-	/* Close files */
+	// Close files 
 	inf.close();
 	fclose(output);
 
 	// Second, split glues into minimal chunks.
 	// Assume glues are given in terms of closed intervals.
 	// Assume that there are no gaps (this case would be difficult to handle properly and would require more information in the alignment)
-	vector<int> bps;
-	getBlockBps(blocks, bps);
-	split_blocks(blocks, bps);
+	ofstream debf;
+
+	int oldNumBlocks;
+	do {
+		oldNumBlocks = blocks.size();
+		vector<int> bps;
+		getBlockBps(blocks, bps);
+		split_blocks(blocks, bps);
+	} while (blocks.size() != oldNumBlocks);
+
+	open_file(debf, "blocks2");
+	//debf << "BPS START\t" << bps << "\tBPS END\n";
+	for (int i = 0; i < blocks.size(); i++) print_block(debf, blocks[i], i);
+	debf.close();
 
 	//perform transitive closure of blocks 
 	//at this point, any two intervals are either disjoint or identical
