@@ -1,0 +1,13 @@
+File formats:
+
+rmap (binary): read_id, orientation, ref_name, ref_pos(1-based), normodds
+scov (binary), array of doubles for the ref length 
+gc   (binary), array of doubles for the ref length
+mmap : dist, ref_name, left_pos, right_pos, template_id, type, leftOrient, rightOrient
+t?, links, links.cov : interval, type, size, from-width, to-width, avg-md, cluster#, EDGE, [fromBlock, toBlock, fromEnd, toEnd)
+block.cov: interval inv? size idx [doc, exp, len]
+graph:
+n id bal
+a (-)from (-)to low cap cost
+convex_arc (-)from (-)to k(read_count), l(avg_length), lambda
+
