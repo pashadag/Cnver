@@ -97,6 +97,7 @@ int main(int argc, char ** argv) {
 		vector<int> bps;
 		getBlockBps(blocks, bps);
 		split_blocks(blocks, bps);
+		cerr << "Created " << blocks.size() <<  " blocks.\n";
 	} while (blocks.size() != oldNumBlocks);
 
 	open_file(debf, "blocks2");
