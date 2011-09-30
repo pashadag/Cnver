@@ -65,10 +65,10 @@ int removeMaxFlow(int start, int len, int call) {
 }
 
 
-void decreaseUnitFlow(int start, int len, int change) {
+void restoreUnitFlow(int start, int len, int change) {
 	for (int i = start; i < start + len; i++) {
 		int blockIdx = intervals[i].blockIdx;
-		blockFlow[blockIdx] -= change;
+		blockFlow[blockIdx] += change;
 	}
 }
 
@@ -90,15 +90,13 @@ void findLongestPath(int & maxStart, int & maxBlockLen, int & maxBpLen, int & ma
 			curCall = -1;
 
 		if (curCall != lastCall && lastCall != 0) { //end path 
+			restoreUnitFlow(start, i - start, lastCall); //restore original flow
 			if (bpLen > maxBpLen) {
 				maxBpLen = bpLen;
 				maxBlockLen = i - start;
 				maxStart = start;
 				maxCall = lastCall;
 			}
-			//restore origin flow
-			decreaseUnitFlow(start, i - start, lastCall);
-
 		} 
 
 		if (curCall != 0) { //either start a new path or continue an old one
@@ -111,51 +109,14 @@ void findLongestPath(int & maxStart, int & maxBlockLen, int & maxBpLen, int & ma
 		}
 		lastCall = curCall;
 	}
-}
 
-
-
-/*
-void findLongestPath(int & maxStart, int & maxBlockLen, int & maxBpLen, int & maxCall) {
-	tempFlow = blockFlow;
-	maxBpLen = 0;
-	int start;
-	int bpLen = 0;
-	int lastCall = 0;
-	for (int i = 0; i < intervals.size(); i++) {
-		int blockIdx = intervals[i].blockIdx;
-		int curFlow = tempFlow.at(blockIdx);
-		int refCount = blocks[blockIdx].intv.size() * ploidy;
-		int curCall;
-		if (curFlow == refCount)     
-			curCall = 0;
-		else if (curFlow > refCount) 
-			curCall = 1;
-		else if (curFlow < refCount) 
-			curCall = -1;
-
-		if (curCall != lastCall && lastCall != 0) { //end path 
-			if (bpLen > maxBpLen) {
-				maxBpLen = bpLen;
-				maxBlockLen = i - start;
-				maxStart = start;
-				maxCall = lastCall;
-			}
-		} 
-
-		if (curCall != 0) { //either start a new path or continue an old one
-			if (curCall != lastCall) { //start a new path
-				tempFlow = blockFlow;
-				start = i;
-				bpLen = 0;
-			} 
-			tempFlow.at(blockIdx) -= curCall;
-			bpLen += intervals[i].intv.end - intervals[i].intv.start + 1;
-		}
-		lastCall = curCall;
+	//fix up last path
+	if (lastCall != 0) {
+		restoreUnitFlow(start, intervals.size() - start, lastCall); 
 	}
+
+
 }
-*/
 
 int main(int argc, char ** argv) {
 
