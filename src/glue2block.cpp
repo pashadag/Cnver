@@ -92,11 +92,13 @@ int main(int argc, char ** argv) {
 	ofstream debf;
 
 	int oldNumBlocks;
+	vector<int> bps;
 	do {
+		vector<int> newbps;
 		oldNumBlocks = blocks.size();
-		vector<int> bps;
 		getBlockBps(blocks, bps);
-		split_blocks(blocks, bps);
+		split_blocks(blocks, bps, newbps);
+		bps = newbps; 
 		cerr << "Created " << blocks.size() <<  " blocks.\n";
 	} while (blocks.size() != oldNumBlocks);
 

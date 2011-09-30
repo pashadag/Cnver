@@ -24,7 +24,7 @@ void getBlockBps(vector<Block> & blocks, vector<int> & bps) {
 	}
 }
 
-void split_block(int blockIdx, vector<int> & bps, vector<Block> & blocks, int main_idx) {
+void split_block(int blockIdx, vector<int> & bps, vector<int> & newbps, vector<Block> & blocks, int main_idx) {
 	assert(blockIdx < blocks.size());
 	if (main_idx >= blocks[blockIdx].intv.size()) {
 		return;
@@ -44,6 +44,7 @@ void split_block(int blockIdx, vector<int> & bps, vector<Block> & blocks, int ma
 			if (sec_idx == main_idx) continue;
 			b->intv[sec_idx].start += bp - b->intv[main_idx].start;
 			newblock.intv[sec_idx].end = b->intv[sec_idx].start - 1;
+			newbps.push_back(b->intv[sec_idx].start);
 		}
 		b->intv[main_idx].start = bp;
 		newblock.intv[main_idx].end = b->intv[main_idx].start - 1;
@@ -52,7 +53,7 @@ void split_block(int blockIdx, vector<int> & bps, vector<Block> & blocks, int ma
 }
 
 
-void split_blocks(vector<Block> & blocks, vector<int> &bps) {
+void split_blocks(vector<Block> & blocks, vector<int> &bps, vector<int> &newbps) {
 	// Assume that there are no gaps (this case would be difficult to handle properly and would require more information in the alignment)
 	sort(bps.begin(), bps.end());
 	int maxBlockSize = 0;
@@ -61,12 +62,17 @@ void split_blocks(vector<Block> & blocks, vector<int> &bps) {
 	for (int main_idx = 0; main_idx < maxBlockSize; main_idx++) {
 		int numBlocks = blocks.size();
 		for (int i = 0; i < numBlocks; i++) {
-			split_block(i, bps, blocks, main_idx);
+			split_block(i, bps, newbps, blocks, main_idx);
 		}
 	}
 
 }
 
+
+void split_blocks(vector<Block> & blocks, vector<int> &bps) {
+	vector<int> newbps;
+	split_blocks(blocks, bps, newbps);
+}
 
 void read_blocks(ifstream & inf, vector<Block> & blocks) {
 	string lastIndex = "-1";
