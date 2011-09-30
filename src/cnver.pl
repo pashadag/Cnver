@@ -7,6 +7,8 @@ use File::Path;
 use File::Copy;
 use Env;
 
+my $silent = 0;
+
 sub getTime{
 	my @months = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 	my @weekDays = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
@@ -21,7 +23,9 @@ sub execCommand {
 	my $retval;
 	my ($command) = @_;
 	print LOGFILE getTime() ."\t\t". $command . "\n";
-	print "Exec at " . getTime() . " $command...\n";
+	if (!$silent) {
+		print "Exec at " . getTime() . " $command...\n";
+	}
 	$retval  = `$command`;
 	if ( $? != 0 ) {
 		print "command failed: $!\n";
@@ -57,6 +61,7 @@ print ( "Usage:
 	--ref_single <string>      : used to limit the execution of the second stage to one reference sequence. This will override the ref_names option during the second stage.
 	--mode <string>            : you can specify either stage1 or stage2 in order to only run those stages of CNVer.
 	--dump                     : forces CNVer to run in dump mode, creating auxiliary files usefule for debugging but slowing down the execution.
+	--silent                   : removes progress messages from output
 
 	Note:
 	1. Please give all filenames in absolute paths\n");
@@ -88,7 +93,7 @@ print LOGFILE getTime() . "\t cnver called with $paramLine\n";
 
 GetOptions ('map_list=s' => \$map_list, 'ref_folder=s' => \$ref_folder, 'ref_names=s' => \$ref_name_file_of_interest, 'read_len=i' => \$read_len, 'mean_insert=i' => \$mean_insert, 
 	'stdev_insert=i' => \$stdev_insert, 'min_mps=i' => \$min_mps, 'mapping_format=s' => \$mapping_format, 'work_dir=s' => \$temp_folder, 'mode=s' => \$mode, 
-	'mem_lim=i' => \$mem_lim, 'ref_single=s' => \$ref_single, 'dump' => \$dump, 'ploidy=i' => \$ploidy ) or usage();
+	'mem_lim=i' => \$mem_lim, 'ref_single=s' => \$ref_single, 'silent' => \$silent, 'dump' => \$dump, 'ploidy=i' => \$ploidy ) or usage();
 
 if (!defined($map_list) or !defined($ref_folder) or $mean_insert < 0 or $stdev_insert < 0 or $min_mps < 1 or $ploidy != 2) {
 	usage();
@@ -249,11 +254,12 @@ MISC:
 	execCommand ("$CNVER_FOLDER/src/add_links $work_fol/$ref.blocks.breaks $work_fol/$ref.links > $work_fol/$ref.blocks.breaks.links");
 	execCommand ("cat $work_fol/$ref.blocks.breaks.links | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc internal  > $work_fol/$ref.blocks.breaks.links.cov");
 	execCommand ("$CNVER_FOLDER/src/block2graph $work_fol/$ref.blocks.breaks.links.cov $work_fol/$ref.links $work_fol/$ref.graph $ploidy");
+	execCommand ("cat $work_fol/$ref.graph | $CNVER_FOLDER/src/flow_solve/graph2dot > $work_fol/$ref.dot");
 
 	#solve the flow
 	execCommand ("cat $work_fol/$ref.graph | $CNVER_FOLDER/src/flow_solve/linearize > $work_fol/$ref.graph.lin");
 	execCommand ("$CNVER_FOLDER/src/flow_solve/biflow_solve.pl $work_fol/$ref.graph.lin $work_fol/$ref.graph.lin.mon");
-	execCommand ("$CNVER_FOLDER/src/flow_solve/flow2sol $work_fol/$ref.links.placed $work_fol/$ref.graph.lin.sol > $work_fol/$ref.sol");
+	execCommand ("$CNVER_FOLDER/src/flow_solve/flow2sol $work_fol/$ref.blocks.breaks.links.cov $work_fol/$ref.links.placed $work_fol/$ref.graph.lin.sol > $work_fol/$ref.sol");
 	execCommand ("$CNVER_FOLDER/src/report_cnvs $work_fol/$ref.blocks.breaks.links.cov $work_fol/$ref.sol $ploidy $min_cnv_length > $work_fol/$ref.cnvs.raw");
 
 	# remove calls that overlap contig breaks
@@ -264,37 +270,13 @@ MISC:
 	execCommand ("$CNVER_FOLDER/src/smoother.sh 5 $min_cnv_length $ref.cnvs.raw.screened > $work_fol/$ref.cnvs.smoothed");
 	chdir "..";
 
-	next;
-
-	#old graph code
-	execCommand ("$CNVER_FOLDER/src/make_reference_graph $work_fol/$ref.edges $work_fol/$ref.graph.old");
-	execCommand ("$CNVER_FOLDER/src/fill_reference_graph $work_fol/$ref.graph.old $ref_length");
-	#make the donor graph
-	execCommand("$CNVER_FOLDER/src/make_donor_graph $work_fol/$ref.graph.old $work_fol/$ref.links $work_fol/$ref.scov $work_fol/$ref.breaks $work_fol/$ref.gc 1> $work_fol/$ref.problem.old 2> $work_fol/$ref.graphinfo");
-
-	my $contiglen = `tail -n 1 $work_fol/$ref.graphinfo | awk '{print \$2 }' `;
-	my $numreads  = `tail -n 1 $work_fol/$ref.graphinfo | awk '{print \$3 }' `;
-	chomp $contiglen;
-	chomp $numreads;
-
-	chdir ($work_fol);
-	#prepare graph for cs2 solver and solve it
-	execCommand ("perl $CNVER_FOLDER/src/flow_solve/make_cs2_graph.pl $contiglen $numreads 10 $ref.problem $ploidy 0 20 1 0 $CNVER_FOLDER/src/cs2-4.6/");
-
-	#get the output cnvs
-	execCommand ("$CNVER_FOLDER/src/report_cnvs_old $work_fol/$ref.graphinfo $work_fol/$ref.problem.out 100 0 2> $work_fol/$ref.cnvs.oldraw 1> $work_fol/$ref.used_dgs");
-
-
-
-
 	#add doc ratios and copy cnvs to results folder
 	mkpath($results_folder);
 	execCommand("cat $work_fol/$ref.cnvs.smoothed | awk -v OFS=\"\\t\" '{ if (\$4 > 0) print \$1, \$2, \$3, \"gain\"; else print \$1, \$2, \$3, \"loss\" }' | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$4, \$6 }' > $results_folder/$ref.cnvs"); 
-	execCommand("cat $work_fol/$ref.cnvs.smoothed | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$4}' | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$4, \$6 }' | $CNVER_FOLDER/src/post_analysis/ref_walker.pl $temp_folder | > $work_fol/$ref.cnvs.smoothed.annot"); 
-	execCommand("cat $work_fol/$ref.cnvs.raw.screened | grep -v \"#\" | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$5}' | sort -k2n,2 | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$4, \$6 }' | $CNVER_FOLDER/src/post_analysis/ref_walker.pl $temp_folder > $work_fol/$ref.cnvs.raw.screened.annot"); 
-	execCommand("cat $work_fol/$ref.cnvs.raw | grep -v \"#\" | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$5}' | sort -k2n,2 | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$4, \$6 }' | $CNVER_FOLDER/src/post_analysis/ref_walker.pl $temp_folder > $work_fol/$ref.cnvs.raw.annot"); 
-	
-
+	execCommand("cat $work_fol/$ref.cnvs.smoothed | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$4}' | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc concise  > $work_fol/$ref.cnvs.smoothed.annot"); 
+	#execCommand("cat $work_fol/$ref.cnvs.smoothed | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$4}' | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc concise | $CNVER_FOLDER/src/post_analysis/ref_walker.pl $temp_folder > $work_fol/$ref.cnvs.smoothed.annot"); 
+	#execCommand("cat $work_fol/$ref.cnvs.raw.screened | grep -v \"#\" | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$5}' | sort -k2n,2 | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc concise  | $CNVER_FOLDER/src/post_analysis/ref_walker.pl $temp_folder > $work_fol/$ref.cnvs.raw.screened.annot"); 
+	#execCommand("cat $work_fol/$ref.cnvs.raw | grep -v \"#\" | awk -v OFS=\"\\t\" '{ print \$1, \$2, \$3, \$5}' | sort -k2n,2 | $CNVER_FOLDER/src/post_analysis/doc_walker $work_fol/$ref.scov $work_fol/$ref.gc concise | $CNVER_FOLDER/src/post_analysis/ref_walker.pl $temp_folder > $work_fol/$ref.cnvs.raw.annot"); 
 }
 
 close(REF_NAMES);

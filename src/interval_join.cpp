@@ -24,8 +24,8 @@ string filename, baseFilename;
 //An optional parameter gap that closes gaps of size gap
 
 void tokenize(string & s, string & chr, int & left, int & right) {
-        //tokenize the string
-        istringstream istrm(s);
+	//tokenize the string
+	istringstream istrm(s);
 	string val;
 	istrm >> chr >> left >> right;
 }

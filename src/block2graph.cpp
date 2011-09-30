@@ -23,25 +23,6 @@ int block2node(int blockIndex, int end) {
 vector<Block> blocks;
 vector<IntervalFromBlock> intervals;
 
-bool comp_lt(const IntervalFromBlock & ifb, const int & pt ) {
-	return (ifb.intv.end < pt);
-}
-
-void find_pos(int pos, int & block, int & end) {
-	vector<IntervalFromBlock>::iterator it = lower_bound(intervals.begin(), intervals.end(), pos, comp_lt);
-	assert(it != intervals.end());
-	if (it->intv.start == pos) {
-		end = 0;
-	} else if (it->intv.end == pos) {
-		end = 1;
-	} else {
-		assert(0);
-	}
-	block = it->blockIdx;
-	bool inv = blocks.at(it->blockIdx).inv.at(it->intIdx);
-	if (inv) end = abs(1 - end);
-}
-
 int main(int argc, char ** argv) {
 
 	if (argc != 5) {
@@ -122,8 +103,8 @@ int main(int argc, char ** argv) {
 	for (int i = 0; i < links.size(); i++) {
 		Link link = links[i];
 		int block1, end1, block2, end2;
-		find_pos(link.from, block1, end1);
-		find_pos(link.to, block2, end2);
+		find_pos(blocks, intervals, link.from, block1, end1);
+		find_pos(blocks, intervals, link.to, block2, end2);
 		int fromNode  = block2node(block1, end1);
 		int toNode    = block2node(block2, end2);
 		if (end1 == 0) fromNode *= -1;

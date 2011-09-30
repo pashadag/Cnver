@@ -17,18 +17,39 @@ vector<IntervalFromBlock> intervals;
 
 int removeMaxFlow(int start, int len, int call) {
 	vector<int> walkCounts(blocks.size(), 0);
+	vector<int> walkBlocks;
 	for (int i = start; i < start + len; i++) {
 		int blockIdx = intervals[i].blockIdx;
 		walkCounts[blockIdx]++;
+		walkBlocks.push_back(blockIdx);
 	}
+	sort(walkBlocks.begin(), walkBlocks.end());
+	walkBlocks.erase(unique(walkBlocks.begin(), walkBlocks.end()), walkBlocks.end());
 
 	bool stillgood = true;
 	int unitsRemoved = 0;
 	while (stillgood) {
-		for (int i = start; i < start + len; i++) {
-			int blockIdx = intervals[i].blockIdx;
+		for (int i = 0; i < walkBlocks.size(); i++) {
+			//start; i < start + len; i++) {
+			//int blockIdx = intervals[i].blockIdx;
+			int blockIdx = walkBlocks[i];
 			int refCount = blocks[blockIdx].intv.size() * ploidy;
+
+			if (call > 0) {
+				assert (blockFlow.at(blockIdx) >= refCount);
+			} else if (call < 0) {
+				assert (blockFlow.at(blockIdx) <= refCount); 
+			}
+
+			int deb = blockFlow.at(blockIdx);
 			blockFlow.at(blockIdx) -= call * walkCounts[blockIdx];
+
+			if (call > 0) {
+				assert (blockFlow.at(blockIdx) >= refCount);
+			} else if (call < 0) {
+				assert (blockFlow.at(blockIdx) <= refCount); 
+			}
+
 			if (call > 0) {
 				if (blockFlow.at(blockIdx) - walkCounts[blockIdx] < refCount) stillgood = false;
 			} else if (call < 0) {

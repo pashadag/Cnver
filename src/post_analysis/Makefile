@@ -34,8 +34,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = doc_walker$(EXEEXT) edge_walker$(EXEEXT) \
-	bestOverlap$(EXEEXT) gcContent$(EXEEXT) alSignal$(EXEEXT)
+bin_PROGRAMS = doc_walker$(EXEEXT) bestOverlap$(EXEEXT) \
+	gcContent$(EXEEXT) alSignal$(EXEEXT) ppwalker$(EXEEXT)
 subdir = src/post_analysis
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -57,12 +57,12 @@ bestOverlap_LDADD = $(LDADD)
 am_doc_walker_OBJECTS = doc_walker.$(OBJEXT)
 doc_walker_OBJECTS = $(am_doc_walker_OBJECTS)
 doc_walker_LDADD = $(LDADD)
-am_edge_walker_OBJECTS = edge_walker.$(OBJEXT)
-edge_walker_OBJECTS = $(am_edge_walker_OBJECTS)
-edge_walker_LDADD = $(LDADD)
 am_gcContent_OBJECTS = gcContent.$(OBJEXT)
 gcContent_OBJECTS = $(am_gcContent_OBJECTS)
 gcContent_LDADD = $(LDADD)
+am_ppwalker_OBJECTS = ppwalker.$(OBJEXT)
+ppwalker_OBJECTS = $(am_ppwalker_OBJECTS)
+ppwalker_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -76,11 +76,9 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(alSignal_SOURCES) $(bestOverlap_SOURCES) \
-	$(doc_walker_SOURCES) $(edge_walker_SOURCES) \
-	$(gcContent_SOURCES)
+	$(doc_walker_SOURCES) $(gcContent_SOURCES) $(ppwalker_SOURCES)
 DIST_SOURCES = $(alSignal_SOURCES) $(bestOverlap_SOURCES) \
-	$(doc_walker_SOURCES) $(edge_walker_SOURCES) \
-	$(gcContent_SOURCES)
+	$(doc_walker_SOURCES) $(gcContent_SOURCES) $(ppwalker_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -160,10 +158,10 @@ sharedstatedir = ${prefix}/com
 sysconfdir = ${prefix}/etc
 target_alias = 
 doc_walker_SOURCES = doc_walker.cpp ../include/interval.h
-edge_walker_SOURCES = edge_walker.cpp
 bestOverlap_SOURCES = bestOverlap.cpp ../include/interval.h
 gcContent_SOURCES = gcContent.cpp ../include/interval.h ../include/defs.h
 alSignal_SOURCES = alSignal.cpp ../include/interval.h ../include/defs.h
+ppwalker_SOURCES = ppwalker.cpp ../include/interval.h ../include/defs.h ../include/block.h
 EXTRA_DIST = segment_walker.pl cluster_info.pl ref_walker.pl
 all: all-am
 
@@ -230,12 +228,12 @@ bestOverlap$(EXEEXT): $(bestOverlap_OBJECTS) $(bestOverlap_DEPENDENCIES)
 doc_walker$(EXEEXT): $(doc_walker_OBJECTS) $(doc_walker_DEPENDENCIES) 
 	@rm -f doc_walker$(EXEEXT)
 	$(CXXLINK) $(doc_walker_LDFLAGS) $(doc_walker_OBJECTS) $(doc_walker_LDADD) $(LIBS)
-edge_walker$(EXEEXT): $(edge_walker_OBJECTS) $(edge_walker_DEPENDENCIES) 
-	@rm -f edge_walker$(EXEEXT)
-	$(CXXLINK) $(edge_walker_LDFLAGS) $(edge_walker_OBJECTS) $(edge_walker_LDADD) $(LIBS)
 gcContent$(EXEEXT): $(gcContent_OBJECTS) $(gcContent_DEPENDENCIES) 
 	@rm -f gcContent$(EXEEXT)
 	$(CXXLINK) $(gcContent_LDFLAGS) $(gcContent_OBJECTS) $(gcContent_LDADD) $(LIBS)
+ppwalker$(EXEEXT): $(ppwalker_OBJECTS) $(ppwalker_DEPENDENCIES) 
+	@rm -f ppwalker$(EXEEXT)
+	$(CXXLINK) $(ppwalker_LDFLAGS) $(ppwalker_OBJECTS) $(ppwalker_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -246,8 +244,8 @@ distclean-compile:
 include ./$(DEPDIR)/alSignal.Po
 include ./$(DEPDIR)/bestOverlap.Po
 include ./$(DEPDIR)/doc_walker.Po
-include ./$(DEPDIR)/edge_walker.Po
 include ./$(DEPDIR)/gcContent.Po
+include ./$(DEPDIR)/ppwalker.Po
 
 .cpp.o:
 	if $(CXXCOMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

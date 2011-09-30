@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <errno.h>
 #include <ctype.h>
-#include "include/defs.h"
-#include "include/interval.h"
+#include "defs.h"
+#include "interval.h"
 
 class Block {
 public:
@@ -124,6 +124,33 @@ void getIntervalsFromBlocks(vector<Block> & blocks, vector<IntervalFromBlock> & 
 		}
 	}
 	sort(intervals.begin(), intervals.end());
+}
+
+bool comp_lt(const IntervalFromBlock & ifb, const int & pt ) {
+	return (ifb.intv.end < pt);
+}
+
+void find_pos(vector<IntervalFromBlock> & intervals, int pos, int & interval, int & end) {
+	vector<IntervalFromBlock>::iterator it = lower_bound(intervals.begin(), intervals.end(), pos, comp_lt);
+	interval = it - intervals.begin();
+	assert(it != intervals.end());
+	if (it->intv.start == pos) {
+		end = 0;
+	} else if (it->intv.end == pos) {
+		end = 1;
+	} else {
+		end = -1;
+	}
+}
+
+
+void find_pos(vector<Block> & blocks, vector<IntervalFromBlock> & intervals, int pos, int & blockIdx, int & end) {
+	int interval;
+	find_pos(intervals, pos, interval, end);
+	blockIdx = intervals[interval].blockIdx;
+	int intIdx   = intervals[interval].intIdx;
+	bool inv = blocks.at(blockIdx).inv.at(intIdx);
+	if (inv && end != -1) end = abs(1 - end);
 }
 
 

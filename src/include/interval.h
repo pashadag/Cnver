@@ -43,8 +43,8 @@ Link read_link(string sbuf) {
 	Link i;
 	line >> i.chr >> i.from >> i.to >> i.type;
 	getline(line, i.label); //the rest of the line is a label
-	int pos = i.label.find_first_not_of(" \t"); //trim leading whitespace
-	i.label = i.label.substr(pos);
+	size_t pos = i.label.find_first_not_of(" \t"); //trim leading whitespace
+	if (pos != string::npos) i.label = i.label.substr(pos);
 	return i;
 }
 
@@ -147,8 +147,8 @@ Interval read_interval(string sbuf) {
 	line >> i.chr >> i.start >> i.end;
 	getline(line, i.label); //the rest of the line is a label
 	//trim leading whitespace in label
-	int pos = i.label.find_first_not_of(" \t");
-	i.label = i.label.substr(pos);
+	size_t pos = i.label.find_first_not_of(" \t");
+	if (pos != string::npos) i.label = i.label.substr(pos);
 	return i;
 }
 

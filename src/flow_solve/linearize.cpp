@@ -89,10 +89,11 @@ void process_convex_arc(vector<string> & row) {
 		assert(center <= 1);
 		if (costofzero > 0) {
 			define_arc(from, to, 0, 1, costofzero);
+			define_arc(from, to, 0, MAX_SEQ_EDGES - high, slope);
 		} else if (costofzero < 0) {
 			define_arc(to, from, 0, 1, -1 * costofzero);
+			define_arc(from, to, 1, MAX_SEQ_EDGES - high, slope);
 		}
-		define_arc(from, to, 1, MAX_SEQ_EDGES - high, slope);
 	} else if (slope >= 0) {
 		assert (low == 1); //why? ah ok, think about the possible cases and you'll get it
 		assert (center >= 1);

@@ -36,11 +36,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = interval_join$(EXEEXT) map_coord$(EXEEXT) \
 	merge_links$(EXEEXT) block2graph$(EXEEXT) add_links$(EXEEXT) \
-	add_breaks$(EXEEXT) glue2block$(EXEEXT) \
-	fill_reference_graph$(EXEEXT) make_gc_map$(EXEEXT) \
-	report_cnvs_old$(EXEEXT) report_cnvs$(EXEEXT) \
-	maps2bin$(EXEEXT) find_spikes$(EXEEXT) \
-	make_reference_graph$(EXEEXT) make_donor_graph$(EXEEXT) \
+	add_breaks$(EXEEXT) glue2block$(EXEEXT) make_gc_map$(EXEEXT) \
+	report_cnvs$(EXEEXT) maps2bin$(EXEEXT) find_spikes$(EXEEXT) \
 	make_simple_coverage$(EXEEXT) interleave_bam$(EXEEXT) \
 	readbin$(EXEEXT) make_ns$(EXEEXT) find_mean_sd$(EXEEXT) \
 	intRemove2$(EXEEXT) filter_axt$(EXEEXT)
@@ -65,9 +62,6 @@ add_links_LDADD = $(LDADD)
 am_block2graph_OBJECTS = block2graph.$(OBJEXT)
 block2graph_OBJECTS = $(am_block2graph_OBJECTS)
 block2graph_LDADD = $(LDADD)
-am_fill_reference_graph_OBJECTS = fill_reference_graph.$(OBJEXT)
-fill_reference_graph_OBJECTS = $(am_fill_reference_graph_OBJECTS)
-fill_reference_graph_LDADD = $(LDADD)
 am_filter_axt_OBJECTS = filter_axt.$(OBJEXT)
 filter_axt_OBJECTS = $(am_filter_axt_OBJECTS)
 filter_axt_LDADD = $(LDADD)
@@ -91,18 +85,12 @@ interleave_bam_LDADD = $(LDADD)
 am_interval_join_OBJECTS = interval_join.$(OBJEXT)
 interval_join_OBJECTS = $(am_interval_join_OBJECTS)
 interval_join_LDADD = $(LDADD)
-am_make_donor_graph_OBJECTS = make_donor_graph.$(OBJEXT)
-make_donor_graph_OBJECTS = $(am_make_donor_graph_OBJECTS)
-make_donor_graph_LDADD = $(LDADD)
 am_make_gc_map_OBJECTS = make_gc_map.$(OBJEXT)
 make_gc_map_OBJECTS = $(am_make_gc_map_OBJECTS)
 make_gc_map_LDADD = $(LDADD)
 am_make_ns_OBJECTS = make_ns.$(OBJEXT)
 make_ns_OBJECTS = $(am_make_ns_OBJECTS)
 make_ns_LDADD = $(LDADD)
-am_make_reference_graph_OBJECTS = make_reference_graph.$(OBJEXT)
-make_reference_graph_OBJECTS = $(am_make_reference_graph_OBJECTS)
-make_reference_graph_LDADD = $(LDADD)
 am_make_simple_coverage_OBJECTS = make_simple_coverage.$(OBJEXT)
 make_simple_coverage_OBJECTS = $(am_make_simple_coverage_OBJECTS)
 make_simple_coverage_LDADD = $(LDADD)
@@ -122,9 +110,6 @@ readbin_LDADD = $(LDADD)
 am_report_cnvs_OBJECTS = report_cnvs.$(OBJEXT)
 report_cnvs_OBJECTS = $(am_report_cnvs_OBJECTS)
 report_cnvs_LDADD = $(LDADD)
-am_report_cnvs_old_OBJECTS = report_cnvs_old.$(OBJEXT)
-report_cnvs_old_OBJECTS = $(am_report_cnvs_old_OBJECTS)
-report_cnvs_old_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -138,27 +123,23 @@ CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 SOURCES = $(add_breaks_SOURCES) $(add_links_SOURCES) \
-	$(block2graph_SOURCES) $(fill_reference_graph_SOURCES) \
-	$(filter_axt_SOURCES) $(find_mean_sd_SOURCES) \
-	$(find_spikes_SOURCES) $(glue2block_SOURCES) \
-	$(intRemove2_SOURCES) $(interleave_bam_SOURCES) \
-	$(interval_join_SOURCES) $(make_donor_graph_SOURCES) \
+	$(block2graph_SOURCES) $(filter_axt_SOURCES) \
+	$(find_mean_sd_SOURCES) $(find_spikes_SOURCES) \
+	$(glue2block_SOURCES) $(intRemove2_SOURCES) \
+	$(interleave_bam_SOURCES) $(interval_join_SOURCES) \
 	$(make_gc_map_SOURCES) $(make_ns_SOURCES) \
-	$(make_reference_graph_SOURCES) \
 	$(make_simple_coverage_SOURCES) $(map_coord_SOURCES) \
 	$(maps2bin_SOURCES) $(merge_links_SOURCES) $(readbin_SOURCES) \
-	$(report_cnvs_SOURCES) $(report_cnvs_old_SOURCES)
+	$(report_cnvs_SOURCES)
 DIST_SOURCES = $(add_breaks_SOURCES) $(add_links_SOURCES) \
-	$(block2graph_SOURCES) $(fill_reference_graph_SOURCES) \
-	$(filter_axt_SOURCES) $(find_mean_sd_SOURCES) \
-	$(find_spikes_SOURCES) $(glue2block_SOURCES) \
-	$(intRemove2_SOURCES) $(interleave_bam_SOURCES) \
-	$(interval_join_SOURCES) $(make_donor_graph_SOURCES) \
+	$(block2graph_SOURCES) $(filter_axt_SOURCES) \
+	$(find_mean_sd_SOURCES) $(find_spikes_SOURCES) \
+	$(glue2block_SOURCES) $(intRemove2_SOURCES) \
+	$(interleave_bam_SOURCES) $(interval_join_SOURCES) \
 	$(make_gc_map_SOURCES) $(make_ns_SOURCES) \
-	$(make_reference_graph_SOURCES) \
 	$(make_simple_coverage_SOURCES) $(map_coord_SOURCES) \
 	$(maps2bin_SOURCES) $(merge_links_SOURCES) $(readbin_SOURCES) \
-	$(report_cnvs_SOURCES) $(report_cnvs_old_SOURCES)
+	$(report_cnvs_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -259,13 +240,9 @@ add_links_SOURCES = add_links.cpp include/interval.h include/defs.h include/bloc
 merge_links_SOURCES = merge_links.cpp include/defs.h 
 map_coord_SOURCES = map_coord.cpp include/defs.h 
 filter_axt_SOURCES = filter_axt.cpp include/defs.h include/dbtypes.h
-fill_reference_graph_SOURCES = fill_reference_graph.c include/graphtypes.h
 make_gc_map_SOURCES = make_gc_map.cpp include/dbtypes.h include/defs.h
 report_cnvs_SOURCES = report_cnvs.cpp include/block.h include/interval.h
-report_cnvs_old_SOURCES = report_cnvs_old.cpp include/dbtypes.h include/graphtypes.h
 find_spikes_SOURCES = find_spikes.c 
-make_reference_graph_SOURCES = make_reference_graph.c include/graphtypes.h
-make_donor_graph_SOURCES = make_donor_graph.cpp include/graphtypes.h include/dbtypes.h 
 make_simple_coverage_SOURCES = make_simple_coverage.cpp include/dbtypes.h
 interval_join_SOURCES = interval_join.cpp 
 SUBDIRS = cluster post_analysis cs2-4.6 high-copy-count-regions flow_solve
@@ -335,9 +312,6 @@ add_links$(EXEEXT): $(add_links_OBJECTS) $(add_links_DEPENDENCIES)
 block2graph$(EXEEXT): $(block2graph_OBJECTS) $(block2graph_DEPENDENCIES) 
 	@rm -f block2graph$(EXEEXT)
 	$(CXXLINK) $(block2graph_LDFLAGS) $(block2graph_OBJECTS) $(block2graph_LDADD) $(LIBS)
-fill_reference_graph$(EXEEXT): $(fill_reference_graph_OBJECTS) $(fill_reference_graph_DEPENDENCIES) 
-	@rm -f fill_reference_graph$(EXEEXT)
-	$(LINK) $(fill_reference_graph_LDFLAGS) $(fill_reference_graph_OBJECTS) $(fill_reference_graph_LDADD) $(LIBS)
 filter_axt$(EXEEXT): $(filter_axt_OBJECTS) $(filter_axt_DEPENDENCIES) 
 	@rm -f filter_axt$(EXEEXT)
 	$(CXXLINK) $(filter_axt_LDFLAGS) $(filter_axt_OBJECTS) $(filter_axt_LDADD) $(LIBS)
@@ -359,18 +333,12 @@ interleave_bam$(EXEEXT): $(interleave_bam_OBJECTS) $(interleave_bam_DEPENDENCIES
 interval_join$(EXEEXT): $(interval_join_OBJECTS) $(interval_join_DEPENDENCIES) 
 	@rm -f interval_join$(EXEEXT)
 	$(CXXLINK) $(interval_join_LDFLAGS) $(interval_join_OBJECTS) $(interval_join_LDADD) $(LIBS)
-make_donor_graph$(EXEEXT): $(make_donor_graph_OBJECTS) $(make_donor_graph_DEPENDENCIES) 
-	@rm -f make_donor_graph$(EXEEXT)
-	$(CXXLINK) $(make_donor_graph_LDFLAGS) $(make_donor_graph_OBJECTS) $(make_donor_graph_LDADD) $(LIBS)
 make_gc_map$(EXEEXT): $(make_gc_map_OBJECTS) $(make_gc_map_DEPENDENCIES) 
 	@rm -f make_gc_map$(EXEEXT)
 	$(CXXLINK) $(make_gc_map_LDFLAGS) $(make_gc_map_OBJECTS) $(make_gc_map_LDADD) $(LIBS)
 make_ns$(EXEEXT): $(make_ns_OBJECTS) $(make_ns_DEPENDENCIES) 
 	@rm -f make_ns$(EXEEXT)
 	$(CXXLINK) $(make_ns_LDFLAGS) $(make_ns_OBJECTS) $(make_ns_LDADD) $(LIBS)
-make_reference_graph$(EXEEXT): $(make_reference_graph_OBJECTS) $(make_reference_graph_DEPENDENCIES) 
-	@rm -f make_reference_graph$(EXEEXT)
-	$(LINK) $(make_reference_graph_LDFLAGS) $(make_reference_graph_OBJECTS) $(make_reference_graph_LDADD) $(LIBS)
 make_simple_coverage$(EXEEXT): $(make_simple_coverage_OBJECTS) $(make_simple_coverage_DEPENDENCIES) 
 	@rm -f make_simple_coverage$(EXEEXT)
 	$(CXXLINK) $(make_simple_coverage_LDFLAGS) $(make_simple_coverage_OBJECTS) $(make_simple_coverage_LDADD) $(LIBS)
@@ -389,9 +357,6 @@ readbin$(EXEEXT): $(readbin_OBJECTS) $(readbin_DEPENDENCIES)
 report_cnvs$(EXEEXT): $(report_cnvs_OBJECTS) $(report_cnvs_DEPENDENCIES) 
 	@rm -f report_cnvs$(EXEEXT)
 	$(CXXLINK) $(report_cnvs_LDFLAGS) $(report_cnvs_OBJECTS) $(report_cnvs_LDADD) $(LIBS)
-report_cnvs_old$(EXEEXT): $(report_cnvs_old_OBJECTS) $(report_cnvs_old_DEPENDENCIES) 
-	@rm -f report_cnvs_old$(EXEEXT)
-	$(CXXLINK) $(report_cnvs_old_LDFLAGS) $(report_cnvs_old_OBJECTS) $(report_cnvs_old_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -405,7 +370,6 @@ include ./$(DEPDIR)/BamWriter.Po
 include ./$(DEPDIR)/add_breaks.Po
 include ./$(DEPDIR)/add_links.Po
 include ./$(DEPDIR)/block2graph.Po
-include ./$(DEPDIR)/fill_reference_graph.Po
 include ./$(DEPDIR)/filter_axt.Po
 include ./$(DEPDIR)/find_mean_sd.Po
 include ./$(DEPDIR)/find_spikes.Po
@@ -413,17 +377,14 @@ include ./$(DEPDIR)/glue2block.Po
 include ./$(DEPDIR)/intRemove2.Po
 include ./$(DEPDIR)/interleave_bam.Po
 include ./$(DEPDIR)/interval_join.Po
-include ./$(DEPDIR)/make_donor_graph.Po
 include ./$(DEPDIR)/make_gc_map.Po
 include ./$(DEPDIR)/make_ns.Po
-include ./$(DEPDIR)/make_reference_graph.Po
 include ./$(DEPDIR)/make_simple_coverage.Po
 include ./$(DEPDIR)/map_coord.Po
 include ./$(DEPDIR)/maps2bin.Po
 include ./$(DEPDIR)/merge_links.Po
 include ./$(DEPDIR)/readbin.Po
 include ./$(DEPDIR)/report_cnvs.Po
-include ./$(DEPDIR)/report_cnvs_old.Po
 
 .c.o:
 	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

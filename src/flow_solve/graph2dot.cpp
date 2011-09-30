@@ -29,15 +29,16 @@ int main(int argc, char * argv[]) {
 		if (row[0] == "a" || row[0] == "convex_arc") {
 			int from = atoi(row[1].c_str());
 			int to   = atoi(row[2].c_str());
-			cout << abs(from) << " -> " << abs(to);
 			if (from < 0 && to < 0) {
 				swap(from, to);
-			} else if (from < 0 && to > 0) {
-				cout << " [color=green] ";
+			}
+			cout << abs(from) << " -> " << abs(to);
+			if (from < 0 && to > 0) {
+				cout << " [dir=none] ";
 			} else if (from > 0 && to < 0) {
-				cout << " [color=blue] ";
+				cout << " [dir=both] ";
 			} else if (row[0] == "convex_arc") {
-				cout << " [color=red] ";
+				cout << " [color=green] ";
 			}
 			if (labels == "label") {
 				vector<string> rest(row.begin() + 3, row.end());
