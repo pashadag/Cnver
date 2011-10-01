@@ -98,12 +98,12 @@ int main(int argc, char ** argv) {
 	//vector<int> bps;
 	set<int> bps;
 	getBlockBps(blocks, bps);
+	open_file(debf, "bphistory" );
 	do {
 		/*
 		   vector<int> newbps;
 		oldNumBlocks = blocks.size();
 		split_blocks(blocks, bps, newbps);
-		open_file(debf, "blocks." + make_string(iter++));
 		bps = newbps; 
 		sort(bps.begin(), bps.end());
 		debf << "BPS START\t" << bps << "\tBPS END\n";
@@ -111,10 +111,14 @@ int main(int argc, char ** argv) {
 		for (int i = 0; i < blocks.size(); i++) print_block(debf, blocks[i], i);
 		debf.close();
 		 */
+		debf << "(" << iter << ", " << bps.size() << ")\t";
+		for (set<int>::iterator it = bps.begin(); it != bps.end(); it++) debf << *it << "\t";
+		debf << endl;
 		set<int> newbps;
 		oldNumBlocks = blocks.size();
 		split_blocks(blocks, bps, newbps);
-		cerr << "(" << iter++ << ") Created " << blocks.size() <<  " blocks. Bps is " << bps.size() << "\n";
+		cerr << "(" << iter << ") Created " << blocks.size() <<  " blocks. Bps is " << bps.size() << "\n";
+		iter++;
 		bps = newbps;
 	} while (blocks.size() != oldNumBlocks);
 

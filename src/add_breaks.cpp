@@ -23,13 +23,13 @@ int main(int argc, char ** argv) {
 	inf.close();
 
 	//read in bps 
-	vector<int> bps;
+	set<int> bps;
 	int val;
 	if (strcmp(argv[2],"-") == 0) {
-		while (cin >> val) bps.push_back(val);
+		while (cin >> val) bps.insert(val);
 	} else {
 		open_file(inf, argv[2]);
-		while (inf >> val) bps.push_back(val);
+		while (inf >> val) bps.insert(val);
 		inf.close();
 	}
 

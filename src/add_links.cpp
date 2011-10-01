@@ -43,12 +43,12 @@ int main(int argc, char ** argv) {
 	inf.close();
 
 	//create bps from links
-	vector<int> bps;
+	set<int> bps;
 	for (int i = 0; i < links.size(); i++) {
 		int bpfrom, bpto;
 		get_bps(links[i], bpfrom, bpto);
-		bps.push_back(bpfrom);
-		bps.push_back(bpto);
+		bps.insert(bpfrom);
+		bps.insert(bpto);
 	}
 
 	//split blocks up at the bps

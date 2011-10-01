@@ -123,10 +123,9 @@ void split_blocks(vector<Block> & blocks, set<int> &bps, set<int> & newbps) {
 }
 
 
-void split_blocks(vector<Block> & blocks, vector<int> &bps) {
-	vector<int> newbps;
-	exit(1);
-	//split_blocks(blocks, bps, newbps);
+void split_blocks(vector<Block> & blocks, set<int> &bps) {
+	set<int> newbps;
+	split_blocks(blocks, bps, newbps);
 }
 
 void read_blocks(ifstream & inf, vector<Block> & blocks) {
