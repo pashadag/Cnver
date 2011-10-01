@@ -81,7 +81,10 @@ void process_convex_arc(vector<string> & row) {
 	high += NUM_EXTRA_SEGMENTS;
 	low = max(low, 1);
 	high = max(high, 2); 
-	assert(high < MAX_SEQ_EDGES);
+	if (high > MAX_SEQ_EDGES - 1000) {
+		cerr << "warning: very high copy count segment(center is " << center << "), capacity maxed out  (edge " << from << "->" << to <<  ")";
+		high = MAX_SEQ_EDGES - 1000;
+	}
 
 	//add first edge, and an edge to allow zero flow
 	double costofzero = eval_poisson(l, k, lambda, 1) - eval_poisson(l, k, lambda, 1.0 / (1 + ALLOW_NONE)); 
