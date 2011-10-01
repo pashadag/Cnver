@@ -18,7 +18,7 @@
 using namespace std;
 #define SCALE_FACTOR 10000
 #define NUM_EXTRA_SEGMENTS 0 
-#define MAX_SEQ_EDGES 2999
+#define MAX_SEQ_EDGES 1189999
 #define ALLOW_NONE 2
 
 //scales the value of a slope so that it is an integer.
@@ -81,6 +81,7 @@ void process_convex_arc(vector<string> & row) {
 	high += NUM_EXTRA_SEGMENTS;
 	low = max(low, 1);
 	high = max(high, 2); 
+	assert(high < MAX_SEQ_EDGES);
 
 	//add first edge, and an edge to allow zero flow
 	double costofzero = eval_poisson(l, k, lambda, 1) - eval_poisson(l, k, lambda, 1.0 / (1 + ALLOW_NONE)); 

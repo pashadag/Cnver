@@ -87,30 +87,58 @@ int main(int argc, char ** argv) {
 	// Close files 
 	inf.close();
 	fclose(output);
+	int oldNumBlocks;
+	set<int> bps;
+
+
+	cerr << "Building uf on ref pos...";
+	UnionFindClass ufPos(chrLen + 1);
+	for (int i = 0; i < blocks.size(); i++) {
+		for (int offset = 0; offset <= blocks[i].intv[0].end - blocks[i].intv[0].start; offset++) {
+			for (int j = 1; j < blocks[i].intv.size(); j++) {
+				ufPos.unionn(blocks[i].intv[j].start + offset, blocks[i].intv[j-1].start + offset);
+			}
+		}
+	}
+	cerr << "done.\n";
+
+	cerr << "Expanding bps...";
+	vector<vector<int> > posClasses;
+	ufPos.get_classes(posClasses);
+	getBlockBps(blocks, bps);
+	set<int> newbps;
+	for (int i = 0; i < posClasses.size(); i++) {
+		for (int j = 0; j < posClasses[i].size(); j++) {
+			int pos = posClasses[i][j];
+			set<int>::iterator bp = bps.lower_bound(pos);
+			if (bp != bps.end() && *bp == pos) {
+				newbps.insert(posClasses[i].begin(), posClasses[i].end());
+			}
+		}
+	}
+	bps = newbps;
+	cerr << "done.\n";
+
+	
+	split_blocks(blocks, bps);
+	oldNumBlocks = blocks.size();
+	split_blocks(blocks, bps);
+	assert(blocks.size() == oldNumBlocks);
+
+
+/*
 
 	// Second, split glues into minimal chunks.
 	// Assume glues are given in terms of closed intervals.
 	// Assume that there are no gaps (this case would be difficult to handle properly and would require more information in the alignment)
+
 	ofstream debf;
 
-	int oldNumBlocks;
 	int iter = 0;
 	//vector<int> bps;
-	set<int> bps;
 	getBlockBps(blocks, bps);
 	open_file(debf, "bphistory" );
 	do {
-		/*
-		   vector<int> newbps;
-		oldNumBlocks = blocks.size();
-		split_blocks(blocks, bps, newbps);
-		bps = newbps; 
-		sort(bps.begin(), bps.end());
-		debf << "BPS START\t" << bps << "\tBPS END\n";
-		cerr << "(" << iter << ") Created " << blocks.size() <<  " blocks. Newbps is " << newbps.size() << "\n";
-		for (int i = 0; i < blocks.size(); i++) print_block(debf, blocks[i], i);
-		debf.close();
-		 */
 		debf << "(" << iter << ", " << bps.size() << ")\t";
 		for (set<int>::iterator it = bps.begin(); it != bps.end(); it++) debf << *it << "\t";
 		debf << endl;
@@ -126,10 +154,11 @@ int main(int argc, char ** argv) {
 	//debf << "BPS START\t" << bps << "\tBPS END\n";
 	for (int i = 0; i < blocks.size(); i++) print_block(debf, blocks[i], i);
 	debf.close();
+*/
 
 	//perform transitive closure of blocks 
 	//at this point, any two intervals are either disjoint or identical
-	UnionFindClass uf(2 * blocks.size());
+	UnionFindInvClass uf(2 * blocks.size());
 	vector<pair<Interval, int> > intervals;
 	int curidx = 0;
 	for (int i = 0; i < blocks.size(); i++) {

@@ -23,62 +23,10 @@ void getBlockBps(vector<Block> & blocks, set<int> & bps) {
 		}
 	}
 }
-/*
-void getBlockBps(vector<Block> & blocks, vector<int> & bps) {
-	for (int i = 0; i < blocks.size(); i++) {
-		Block b = blocks[i];
-		for (int idx = 0; idx < b.intv.size(); idx++) {
-			bps.push_back(b.intv[idx].start); 
-			bps.push_back(b.intv[idx].end + 1); 
-		}
-	}
-}
-void split_block(int blockIdx, vector<int> & bps, vector<int> & newbps, vector<Block> & blocks, int main_idx) {
-	assert(blockIdx < blocks.size());
-	if (main_idx >= blocks[blockIdx].intv.size()) {
-		return;
-	}
 
-	int bp_start, bp_end;
-	Interval range = blocks[blockIdx].intv[main_idx];
-	searchRange(bps, range, bp_start, bp_end);
-	for (int i = bp_start; i < bp_end; i++) {
-		int bp = bps[i];
-		Block * b = &blocks[blockIdx];
-		//assume alignments have no gaps
-		//break off the beginning
-		if (bp == b->intv[main_idx].start) continue;
-		Block newblock = *b;
-		for (int sec_idx = 0; sec_idx < b->intv.size(); sec_idx++) {
-			if (sec_idx == main_idx) continue;
-			b->intv[sec_idx].start += bp - b->intv[main_idx].start;
-			newblock.intv[sec_idx].end = b->intv[sec_idx].start - 1;
-			newbps.push_back(b->intv[sec_idx].start);
-		}
-		b->intv[main_idx].start = bp;
-		newblock.intv[main_idx].end = b->intv[main_idx].start - 1;
-		blocks.push_back(newblock);
-	}
-}
-
-
-void split_blocks(vector<Block> & blocks, vector<int> &bps, vector<int> &newbps) {
-	// Assume that there are no gaps (this case would be difficult to handle properly and would require more information in the alignment)
-	sort(bps.begin(), bps.end());
-	int maxBlockSize = 0;
-	for (int i = 0; i < blocks.size(); i++) maxBlockSize = max(maxBlockSize, (int) blocks[i].intv.size());
-
-	for (int main_idx = 0; main_idx < maxBlockSize; main_idx++) {
-		int numBlocks = blocks.size();
-		for (int i = 0; i < numBlocks; i++) {
-			split_block(i, bps, newbps, blocks, main_idx);
-		}
-	}
-
-}
-
-*/
-
+//bps are the set of breakpoints and are updated as new ones are created
+//the new ones are also put into newbps as a pass-back parameter.
+//only the main_idx interval of each block is checked for overlaps with bps.
 void split_block(int blockIdx, set<int> & bps, set<int> & newbps, vector<Block> & blocks, int main_idx) {
 	assert(blockIdx < blocks.size());
 	if (main_idx >= blocks[blockIdx].intv.size()) {
@@ -87,7 +35,6 @@ void split_block(int blockIdx, set<int> & bps, set<int> & newbps, vector<Block> 
 
 	int bp_start, bp_end;
 	Interval range = blocks[blockIdx].intv[main_idx];
-	//searchRange(bps, range, bp_start, bp_end);
 	for ( set<int>::iterator bp = bps.lower_bound(range.start); bp != bps.end() && *bp <= range.end; bp++) {
 		Block * b = &blocks[blockIdx];
 		//assume alignments have no gaps
@@ -109,7 +56,8 @@ void split_block(int blockIdx, set<int> & bps, set<int> & newbps, vector<Block> 
 
 
 void split_blocks(vector<Block> & blocks, set<int> &bps, set<int> & newbps) {
-	// Assume that there are no gaps (this case would be difficult to handle properly and would require more information in the alignment)
+	// Assume that there are no gaps (this case would be difficult to handle properly 
+	// and would require more information in the alignment)
 	int maxBlockSize = 0;
 	for (int i = 0; i < blocks.size(); i++) maxBlockSize = max(maxBlockSize, (int) blocks[i].intv.size());
 
@@ -121,7 +69,6 @@ void split_blocks(vector<Block> & blocks, set<int> &bps, set<int> & newbps) {
 	}
 
 }
-
 
 void split_blocks(vector<Block> & blocks, set<int> &bps) {
 	set<int> newbps;
@@ -210,64 +157,4 @@ void find_pos(vector<Block> & blocks, vector<IntervalFromBlock> & intervals, int
 	bool inv = blocks.at(blockIdx).inv.at(intIdx);
 	if (inv && end != -1) end = abs(1 - end);
 }
-/*
-void selectBlocks(vector<Block> & blocks, vector<int> & bps, vector<int> & blockIdxs) {
-	UnionFindClass uf(blocks.size());
-	vector<IntervalFromBlock> intervals;
-	getIntervalsFromBlocks(blocks, intervals);
-
-	for (int i = 0; i < blocks.size(); i++) {
-		for (int intIdx = 0; intIdx < blocks[i].intv.size(); intIdx++) {
-			int bp_start, bp_end;
-			Interval range = blocks[i].intv[intIdx];
-			searchRange(bps, range, bp_start, bp_end);
-			if (bp_start != bp_end) {
-				blockIdx.push_back(i);
-			}
-		}
-	}
-}
-
-
-
-void split_blocks2(vector<Block> & blocks, vector<int> &bps, vector<int> &newbps) {
-	// Assume that there are no gaps (this case would be difficult to handle properly and would require more information in t he alignment)
-	sort(bps.begin(), bps.end());
-	int maxBlockSize = 0;
-	for (int i = 0; i < blocks.size(); i++) maxBlockSize = max(maxBlockSize, (int) blocks[i].intv.size());
-
-	for (int main_idx = 0; main_idx < maxBlockSize; main_idx++) {
-		int numBlocks = blocks.size();
-		for (int i = 0; i < numBlocks; i++) {
-			split_block(i, bps, newbps, blocks, main_idx);
-		}
-	}
-
-}
-
-*/
-
-/*
-   void split_intervals(vector<Interval> & intervals, vector<int> & bps) {
-   vector<Interval> newIntervals;
-   sort(bps.begin(), bps.end());
-   for (int i = 0; i < intervals.size(); i++) {
-   int bp_start, bp_end;
-   Interval intv = intervals[i];
-   searchRange(bps, intv, bp_start, bp_end);
-   for (int i = bp_start; i < bp_end; i++) {
-   int bp = bps[i];
-   if (bp == intv.start) continue;
-   Interval newIntv = intv;
-   intv.start = bp;
-   newIntv.end = intv.start - 1;
-   newIntervals.push_back(newIntv);
-   }
-   newIntervals.push_back(intv);
-   }
-   intervals = newIntervals;
-   return;
-   }
- */
-
 
