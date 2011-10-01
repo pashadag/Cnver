@@ -11,13 +11,15 @@
 #include "include/union.h"
 #include "include/block.h"
 
+/*
+typedef set<int> adjList; //to, length
+typedef vector< spAdjList > adjType;
+*/
 
 bool operator== (const Interval & i1, const Interval & i2) {
 	return (i1.chr == i2.chr && i1.start == i2.start && i1.end == i2.end && i1.label == i2.label);
 }
 
-/* Takes, as input, a glue file. Produces, as output,
-   repeat graph entries (to be sorted later) */
 int main(int argc, char ** argv) {
 
 	/* Validate input, but not too much. */
@@ -92,14 +94,28 @@ int main(int argc, char ** argv) {
 	ofstream debf;
 
 	int oldNumBlocks;
-	vector<int> bps;
+	int iter = 0;
+	//vector<int> bps;
+	set<int> bps;
+	getBlockBps(blocks, bps);
 	do {
-		vector<int> newbps;
+		/*
+		   vector<int> newbps;
 		oldNumBlocks = blocks.size();
-		getBlockBps(blocks, bps);
 		split_blocks(blocks, bps, newbps);
+		open_file(debf, "blocks." + make_string(iter++));
 		bps = newbps; 
-		cerr << "Created " << blocks.size() <<  " blocks.\n";
+		sort(bps.begin(), bps.end());
+		debf << "BPS START\t" << bps << "\tBPS END\n";
+		cerr << "(" << iter << ") Created " << blocks.size() <<  " blocks. Newbps is " << newbps.size() << "\n";
+		for (int i = 0; i < blocks.size(); i++) print_block(debf, blocks[i], i);
+		debf.close();
+		 */
+		set<int> newbps;
+		oldNumBlocks = blocks.size();
+		split_blocks(blocks, bps, newbps);
+		cerr << "(" << iter++ << ") Created " << blocks.size() <<  " blocks. Bps is " << bps.size() << "\n";
+		bps = newbps;
 	} while (blocks.size() != oldNumBlocks);
 
 	open_file(debf, "blocks2");
