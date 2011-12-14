@@ -46,7 +46,7 @@ public:
 			}
 			strcpy(mapt.ref_name, ("chr" + make_string(ref_num)).c_str());
 			mapt.ref_pos++; //cnver uses 1-based indexing, while bowtie is 0-based.
-		} else if (input_format == "text"){
+		} else if (input_format == "txt"){
 			if (!getline(*inf, sbuf)) return false;
 			istringstream line(sbuf);
 			line >> mapt.read_id >> mapt.orientation >> mapt.ref_name >> mapt.ref_pos;
