@@ -40,7 +40,7 @@ void usage( int argc, char ** argv) {
 	printf("Usage: %s map_list ref_names input_format \n", argv[0]);
 	cout << "\tmap_list     : file with names of mapping files.\n";
 	cout << "\tref_names    : file with names of reference sequences.\n";
-	cout << "\tinput_format : format of mapping files, either \"bam\" or \"text\".\n";
+	cout << "\tinput_format : format of mapping files, either \"bam\" or \"txt\".\n";
 	cout << endl;
 	exit(1);
 }
