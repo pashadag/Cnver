@@ -120,7 +120,6 @@ my $results_folder            = "$temp_folder/calls/";
 (-d $self_alignments_folder)     or die("Folder $self_alignments_folder does not exist!");
 (-d $fasta_files_folder)         or die("Folder $fasta_files_folder does not exist!");
 (-d $temp_folder)                or die("Folder $temp_folder does not exist!");
-(-e $map_list)                   or die("File $map_list does not exist");
 
 
 # CNVer will not make calls shorter than this many bases (unmasked).
@@ -174,6 +173,8 @@ if ($mode eq "stage1") {
 
 
 STAGE1:
+
+(-e $map_list)                   or die("File $map_list does not exist");
 
 #Create the binary read mapping files (rmap) and the matepair mapping files (mmap)
 mkpath($mapping_files_folder);

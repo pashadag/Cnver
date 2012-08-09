@@ -57,8 +57,8 @@ my $ploidy             = 2; # this needs to be taken out.
 
 (-d "$work_dir")            or die ("Missing $work_dir folder.");
 (-e "$scov_file")           or die ("Missing $scov_file file.");
-(-e "$sol_file")           or die ("Missing $scov_file file.");
-(-e "$block_file")           or die ("Missing $scov_file file.");
+(-e "$sol_file")           or die ("Missing $sol_file file.");
+(-e "$block_file")           or die ("Missing $block_file file.");
 (-e "$gc_file")             or die ("Missing $gc_file file.");
 
 if (scalar(@ARGV) == 4) {
