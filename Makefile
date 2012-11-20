@@ -68,13 +68,13 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/pmedvedev/Cnver/missing --run aclocal-1.9
+ACLOCAL = ${SHELL} /gpfs/home/pzm11/Cnver/missing --run aclocal-1.9
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /home/pmedvedev/Cnver/missing --run tar
-AUTOCONF = ${SHELL} /home/pmedvedev/Cnver/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/pmedvedev/Cnver/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/pmedvedev/Cnver/missing --run automake-1.9
+AMTAR = ${SHELL} /gpfs/home/pzm11/Cnver/missing --run tar
+AUTOCONF = ${SHELL} /gpfs/home/pzm11/Cnver/missing --run autoconf
+AUTOHEADER = ${SHELL} /gpfs/home/pzm11/Cnver/missing --run autoheader
+AUTOMAKE = ${SHELL} /gpfs/home/pzm11/Cnver/missing --run automake-1.9
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -98,7 +98,7 @@ LDFLAGS =
 LIBOBJS = 
 LIBS = -lz 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/pmedvedev/Cnver/missing --run makeinfo
+MAKEINFO = ${SHELL} /gpfs/home/pzm11/Cnver/missing --run makeinfo
 OBJEXT = o
 PACKAGE = cnver
 PACKAGE_BUGREPORT = cnver@cs.toronto.edu
@@ -130,7 +130,7 @@ exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/pmedvedev/Cnver/install-sh
+install_sh = /gpfs/home/pzm11/Cnver/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
@@ -377,7 +377,7 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
-	-find $(distdir) -type d ! -perm -777 -exec chmod a+rwx {} \; -o \
+	-find $(distdir) -type d ! -perm -755 -exec chmod a+rwx,go+rx {} \; -o \
 	  ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
 	  ! -type d ! -perm -400 -exec chmod a+r {} \; -o \
 	  ! -type d ! -perm -444 -exec $(SHELL) $(install_sh) -c -m a+r {} {} \; \

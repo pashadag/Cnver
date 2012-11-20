@@ -1,1 +1,50 @@
-# dummy
+cs2-timer.o: timer.c /usr/include/sys/time.h \
+ /gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include-fixed/features.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+ /usr/include/bits/types.h \
+ /gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stddef.h \
+ /usr/include/bits/typesizes.h /usr/include/time.h \
+ /usr/include/bits/time.h /usr/include/sys/select.h \
+ /usr/include/bits/select.h /usr/include/bits/sigset.h \
+ /usr/include/sys/resource.h /usr/include/bits/resource.h \
+ /usr/include/unistd.h /usr/include/bits/posix_opt.h \
+ /usr/include/bits/confname.h
+
+/usr/include/sys/time.h:
+
+/gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include-fixed/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/bits/types.h:
+
+/gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stddef.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/time.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/sys/resource.h:
+
+/usr/include/bits/resource.h:
+
+/usr/include/unistd.h:
+
+/usr/include/bits/posix_opt.h:
+
+/usr/include/bits/confname.h:

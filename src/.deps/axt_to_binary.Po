@@ -1,1 +1,82 @@
-# dummy
+axt_to_binary.o: axt_to_binary.c /usr/include/stdio.h \
+ /gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include-fixed/features.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+ /gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stddef.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/libio.h /usr/include/_G_config.h \
+ /gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include-fixed/wchar.h \
+ /usr/include/bits/wchar.h /usr/include/gconv.h \
+ /gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/stdlib.h /usr/include/string.h \
+ /gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stdint.h \
+ /usr/include/stdint.h /usr/include/errno.h /usr/include/bits/errno.h \
+ /usr/include/linux/errno.h /usr/include/asm/errno.h \
+ /usr/include/asm-x86_64/errno.h /usr/include/asm-generic/errno.h \
+ /usr/include/asm-generic/errno-base.h /usr/include/ctype.h \
+ /usr/include/endian.h /usr/include/bits/endian.h include/graphtypes.h
+
+/usr/include/stdio.h:
+
+/gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include-fixed/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stddef.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include-fixed/wchar.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/gconv.h:
+
+/gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/string.h:
+
+/gpfs/apps/x86_64-rhel5/gcc/4.5.1/bin/../lib/gcc/x86_64-unknown-linux-gnu/4.5.1/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/errno.h:
+
+/usr/include/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/asm/errno.h:
+
+/usr/include/asm-x86_64/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/ctype.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+include/graphtypes.h:
